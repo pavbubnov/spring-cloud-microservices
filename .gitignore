@@ -15,6 +15,7 @@ deposit-service/.gradle
 
 notification-service/build
 notification-service/.gradle
+notification-service/src/main/resources/mail-props.properties
 
 gateway/build
 gateway/.gradle
