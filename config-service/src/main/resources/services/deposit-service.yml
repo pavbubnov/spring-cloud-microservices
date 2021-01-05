@@ -7,9 +7,9 @@ spring:
     properties:
   datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/dsposit_service_database
+    url: jdbc:postgresql://192.168.1.3:5432/deposit_service_database
     username: postgres
-    password: root
+    password: admin
     driver-class-name: org.postgresql.Driver
 
   rabbitmq:
@@ -20,3 +20,6 @@ spring:
     listener:
       direct:
         default-requeue-rejected: true
+
+server:
+  port: 9090
