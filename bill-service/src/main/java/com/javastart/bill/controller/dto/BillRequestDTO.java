@@ -10,6 +10,8 @@ public class BillRequestDTO {
 
     private Long accountId;
 
+    private Long billId;
+
     private BigDecimal amount;
 
     private Boolean isDefault;

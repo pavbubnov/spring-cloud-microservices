@@ -26,7 +26,7 @@ public class BillController {
 
     @PostMapping("/")
     public Long createBill(@RequestBody BillRequestDTO billRequestDTO) {
-        return billService.createBill(billRequestDTO.getAccountId(), billRequestDTO.getAmount(),
+        return billService.createBill(billRequestDTO.getAccountId(), billRequestDTO.getBillId(), billRequestDTO.getAmount(),
                 billRequestDTO.getIsDefault(), billRequestDTO.getOverdraftEnabled());
     }
 

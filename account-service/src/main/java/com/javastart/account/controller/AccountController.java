@@ -6,6 +6,8 @@ import com.javastart.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class AccountController {
 
@@ -34,8 +36,14 @@ public class AccountController {
                 accountRequestDTO.getPhone(), accountRequestDTO.getBills()));
     }
 
+    @PatchMapping("/{accountId}")
+    public AccountResponseDTO addAccountBills(@PathVariable Long accountId,
+                                              @RequestBody List<Long> additionalBill) {
+        return new AccountResponseDTO(accountService.addAccountBills(accountId, additionalBill));
+    }
+
     @DeleteMapping("/{accountId}")
-    public AccountResponseDTO deleteAccount(@PathVariable Long accountId) {
-        return new AccountResponseDTO(accountService.deleteAccount(accountId));
+    public String deleteAccount(@PathVariable Long accountId) {
+        return new String(accountService.deleteAccount(accountId));
     }
 }

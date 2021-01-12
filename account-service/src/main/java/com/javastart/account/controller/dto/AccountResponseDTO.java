@@ -1,5 +1,6 @@
 package com.javastart.account.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.javastart.account.entity.Account;
 import lombok.AllArgsConstructor;
 import lombok.Data;

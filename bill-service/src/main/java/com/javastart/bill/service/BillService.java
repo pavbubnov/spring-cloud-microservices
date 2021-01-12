@@ -25,8 +25,8 @@ public class BillService {
                 .orElseThrow(() -> new BillNotFoundException("Unable to find bill with id: " + billId));
     }
 
-    public Long createBill(Long accountId, BigDecimal amount, Boolean isDefault, Boolean overdraftEnabled) {
-        Bill bill = new Bill(accountId, amount, isDefault, OffsetDateTime.now(), overdraftEnabled);
+    public Long createBill(Long accountId, Long billId, BigDecimal amount, Boolean isDefault, Boolean overdraftEnabled) {
+        Bill bill = new Bill(accountId, billId, amount, isDefault, OffsetDateTime.now(), overdraftEnabled);
         return billRepository.save(bill).getBillId();
     }
 
