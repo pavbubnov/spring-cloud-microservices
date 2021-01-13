@@ -20,7 +20,6 @@ import java.time.OffsetDateTime;
 public class Bill {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long billId;
 
     private Long accountId;
