@@ -38,8 +38,8 @@ public class BillController {
     }
 
     @DeleteMapping("/{billId}")
-    public BillResponseDTO deleteBill(@PathVariable Long billId) {
-        return new BillResponseDTO(billService.deleteBill(billId));
+    public String deleteBill(@PathVariable Long billId) {
+        return billService.deleteBill(billId);
     }
 
     @GetMapping("/account/{accountId}")

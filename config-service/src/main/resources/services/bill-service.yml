@@ -16,3 +16,5 @@ server:
   servlet:
     context-path: /bills
   port: 8082
+  error:
+    include-message: always

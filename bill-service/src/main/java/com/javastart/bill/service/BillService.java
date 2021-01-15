@@ -8,9 +8,12 @@ import com.javastart.bill.rest.AccountServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BillService {
@@ -32,10 +35,23 @@ public class BillService {
 
     public Long createBill(Long accountId, Long billId, BigDecimal amount, Boolean isDefault, Boolean overdraftEnabled) {
 
+
         AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(accountId);
 
         if (!accountResponseDTO.getBills().contains(billId)) {
             throw new BillNotFoundException("Account with id: " + accountId + " doesn't contain bill with id: " + billId);
+        }
+
+        List<Bill> billsList = getBillsByAccountId(accountId);
+
+        if (getExistenceBillIdList(accountId).contains(billId)) {
+            throw new BillNotFoundException("Bill with id: " + billId + " is already exists");
+        }
+
+        if (billsList.size() == 0) {
+            isDefault = true;
+        } else if (isDefault) {
+            reDefaultBill(billsList);
         }
 
         Bill bill = new Bill(accountId, billId, amount, isDefault, OffsetDateTime.now(), overdraftEnabled);
@@ -44,19 +60,44 @@ public class BillService {
 
     public Bill updateBill(Long billId, Long accountId, BigDecimal amount,
                            Boolean isDefault, Boolean overdraftEnabled) {
-        Bill bill = new Bill(accountId, amount, isDefault, overdraftEnabled);
-        bill.setBillId(billId);
+
+        List<Bill> billsList = getBillsByAccountId(accountId);
+
+        if (!getExistenceBillIdList(accountId).contains(billId)) {
+            throw new BillNotFoundException("Bill with id: " + billId + " is not belongs to account with id: " + accountId +
+                    " or has't created yet");
+        }
+
+        if (isDefault) {
+            Bill oldDefaultBill = billsList.stream().filter(Bill::getIsDefault).findAny().get();
+            if (oldDefaultBill.getBillId() != billId) {
+                reDefaultBill(billsList);
+            }
+        }
+
+        Bill bill = new Bill(accountId, billId, amount, isDefault,
+                getBillById(accountId).getCreationDate(), overdraftEnabled);
         return billRepository.save(bill);
     }
 
-    public Bill deleteBill(Long billId) {
-        Bill deletedBill = getBillById(billId);
+    public String deleteBill(Long billId) {
+        Bill deleteBill = getBillById(billId);
         billRepository.deleteById(billId);
-        return deletedBill;
+        return "Bill with id: " + billId + " was deleted";
     }
 
     public List<Bill> getBillsByAccountId(Long accountId) {
         return billRepository.getBillsByAccountId(accountId);
+    }
+
+    private void reDefaultBill(List<Bill> billList) {
+        Bill oldDefaultBill = billList.stream().filter(Bill::getIsDefault).findAny().get();
+        updateBill(oldDefaultBill.getBillId(), oldDefaultBill.getAccountId(), oldDefaultBill.getAmount(),
+                false, oldDefaultBill.getOverdraftEnabled());
+    }
+
+    private List<Long> getExistenceBillIdList(Long accountId) {
+        return getBillsByAccountId(accountId).stream().map(bill -> bill.getBillId()).collect(Collectors.toList());
     }
 
 }

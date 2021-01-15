@@ -41,3 +41,4 @@ dependencies {
     implementation "org.postgresql:postgresql:42.2.5"
     testImplementation "junit:junit:4.1"
 }
+
