@@ -7,12 +7,14 @@ import com.javastart.deposit.entity.Deposit;
 import com.javastart.deposit.exception.DepositServiceException;
 import com.javastart.deposit.repository.DepositRepository;
 import com.javastart.deposit.rest.*;
+import feign.FeignException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 public class DepositService {
@@ -38,31 +40,46 @@ public class DepositService {
     }
 
     public DepositResponseDTO deposit(Long accountId, Long billId, BigDecimal amount) {
+
+        BigDecimal availableAmount;
+
         if (accountId == null && billId == null) {
             throw new DepositServiceException("Account is null and bill is null");
         }
 
         if (billId != null) {
-            BillResponseDTO billResponseDTO = billServiceClient.getBillById(billId);
-            BillRequestDTO billRequestDTO = createBillRequest(amount, billResponseDTO);
 
-            billServiceClient.update(billId, billRequestDTO);
+            try {
+                BillResponseDTO billResponseDTO = billServiceClient.getBillById(billId);
+                BillRequestDTO billRequestDTO = createBillRequest(amount, billResponseDTO);
 
-            AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(billResponseDTO.getAccountId());
-            depositRepository.save(new Deposit(amount, billId, OffsetDateTime.now(), accountResponseDTO.getEmail()));
+                billServiceClient.update(billId, billRequestDTO);
+                availableAmount = billRequestDTO.getAmount();
 
-            return createResponse(amount, accountResponseDTO);
+                AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(billResponseDTO.getAccountId());
+                depositRepository.save(new Deposit(amount, billId, OffsetDateTime.now(), accountResponseDTO.getEmail(),
+                        availableAmount));
+
+                return createResponse(billId, amount, accountResponseDTO, availableAmount);
+
+            } catch (FeignException feignException) {
+                throw new DepositServiceException("Unable to find bill with id: " + billId);
+            }
         }
+
         BillResponseDTO defaultBill = getDefaultBill(accountId);
         BillRequestDTO billRequestDTO = createBillRequest(amount, defaultBill);
         billServiceClient.update(defaultBill.getBillId(), billRequestDTO);
         AccountResponseDTO account = accountServiceClient.getAccountById(accountId);
-        depositRepository.save(new Deposit(amount, defaultBill.getBillId(), OffsetDateTime.now(), account.getEmail()));
-        return createResponse(amount, account);
+        availableAmount = billRequestDTO.getAmount();
+
+        depositRepository.save(new Deposit(amount, defaultBill.getBillId(), OffsetDateTime.now(), account.getEmail(),
+                billRequestDTO.getAmount()));
+        return createResponse(billId, amount, account, availableAmount);
     }
 
-    private DepositResponseDTO createResponse(BigDecimal amount, AccountResponseDTO accountResponseDTO) {
-        DepositResponseDTO depositResponseDTO = new DepositResponseDTO(amount, accountResponseDTO.getEmail());
+    private DepositResponseDTO createResponse(Long billId, BigDecimal amount, AccountResponseDTO accountResponseDTO, BigDecimal availableAmount) {
+        DepositResponseDTO depositResponseDTO = new DepositResponseDTO(billId, amount, accountResponseDTO.getEmail(), availableAmount);
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -73,6 +90,16 @@ public class DepositService {
             throw new DepositServiceException("Can't send message to RabbitMQ");
         }
         return depositResponseDTO;
+    }
+
+    public Deposit getDepositById(Long depositId) {
+        return depositRepository.findById(depositId).
+                orElseThrow(() -> new DepositServiceException("Unable to find " +
+                        "deposit with id " + depositId));
+    }
+
+    public List<Deposit> getDepositsByBillId(Long accountId) {
+        return depositRepository.getDepositByBillId(accountId);
     }
 
     private BillRequestDTO createBillRequest(BigDecimal amount, BillResponseDTO billResponseDTO) {
@@ -89,6 +116,7 @@ public class DepositService {
         return billServiceClient.getBillsByAccountId(accountId).stream()
                 .filter(BillResponseDTO::getIsDefault)
                 .findAny()
-                .orElseThrow(() -> new DepositServiceException("Unable to find default bill for account: " + accountId));
+                .orElseThrow(() -> new DepositServiceException("Unable to find default bill for account: " + accountId +
+                        ". Please, that accountId is correct and call to you bank manager."));
     }
 }

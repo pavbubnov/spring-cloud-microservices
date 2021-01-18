@@ -31,10 +31,14 @@ public class Deposit {
 
     private String email;
 
-    public Deposit(BigDecimal amount, Long billId, OffsetDateTime creationDate, String email) {
+    private BigDecimal availableAmount;
+
+    public Deposit(BigDecimal amount, Long billId, OffsetDateTime creationDate, String email, BigDecimal availableAmount) {
         this.amount = amount;
         this.billId = billId;
         this.creationDate = creationDate;
         this.email = email;
+        this.availableAmount = availableAmount;
+
     }
 }

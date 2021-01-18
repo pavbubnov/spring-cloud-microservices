@@ -9,7 +9,11 @@ import java.math.BigDecimal;
 @Setter
 public class DepositResponseDTO {
 
+    private Long billId;
+
     private BigDecimal amount;
 
     private String mail;
+
+    private BigDecimal availableAmount;
 }
