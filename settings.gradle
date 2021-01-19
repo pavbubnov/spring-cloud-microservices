@@ -6,4 +6,5 @@ include 'config-service'
 include 'gateway'
 include 'notification-service'
 include 'registry'
+include 'paymant-service'
 

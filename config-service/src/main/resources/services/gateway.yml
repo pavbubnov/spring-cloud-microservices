@@ -32,5 +32,10 @@ zuul:
       serviceId: deposit-service
       stripPrefix: false
 
+    payment-service:
+      path: /payments/**
+      serviceId: payment-service
+      stripPrefix: false
+
 server:
   port: 8989

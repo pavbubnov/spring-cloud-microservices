@@ -75,7 +75,17 @@ public class DepositService {
 
         depositRepository.save(new Deposit(amount, defaultBill.getBillId(), OffsetDateTime.now(), account.getEmail(),
                 billRequestDTO.getAmount()));
-        return createResponse(billId, amount, account, availableAmount);
+        return createResponse(defaultBill.getBillId(), amount, account, availableAmount);
+    }
+
+    public Deposit getDepositById(Long depositId) {
+        return depositRepository.findById(depositId).
+                orElseThrow(() -> new DepositServiceException("Unable to find " +
+                        "deposit with id " + depositId));
+    }
+
+    public List<Deposit> getDepositsByBillId(Long accountId) {
+        return depositRepository.getDepositByBillId(accountId);
     }
 
     private DepositResponseDTO createResponse(Long billId, BigDecimal amount, AccountResponseDTO accountResponseDTO, BigDecimal availableAmount) {
@@ -90,16 +100,6 @@ public class DepositService {
             throw new DepositServiceException("Can't send message to RabbitMQ");
         }
         return depositResponseDTO;
-    }
-
-    public Deposit getDepositById(Long depositId) {
-        return depositRepository.findById(depositId).
-                orElseThrow(() -> new DepositServiceException("Unable to find " +
-                        "deposit with id " + depositId));
-    }
-
-    public List<Deposit> getDepositsByBillId(Long accountId) {
-        return depositRepository.getDepositByBillId(accountId);
     }
 
     private BillRequestDTO createBillRequest(BigDecimal amount, BillResponseDTO billResponseDTO) {
