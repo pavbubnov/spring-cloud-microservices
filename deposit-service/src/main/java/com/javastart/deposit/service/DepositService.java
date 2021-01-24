@@ -84,8 +84,8 @@ public class DepositService {
                         "deposit with id " + depositId));
     }
 
-    public List<Deposit> getDepositsByBillId(Long accountId) {
-        return depositRepository.getDepositByBillId(accountId);
+    public List<Deposit> getDepositsByBillId(Long billId) {
+        return depositRepository.getDepositByBillId(billId);
     }
 
     private DepositResponseDTO createResponse(Long billId, BigDecimal amount, AccountResponseDTO accountResponseDTO, BigDecimal availableAmount) {

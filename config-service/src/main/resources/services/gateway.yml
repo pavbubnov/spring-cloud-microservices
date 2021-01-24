@@ -4,7 +4,7 @@ hystrix:
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 20000
+            timeoutInMilliseconds: 100000
 
 ribbon:
   ReadTimeout: 20000
@@ -35,6 +35,11 @@ zuul:
     payment-service:
       path: /payments/**
       serviceId: payment-service
+      stripPrefix: false
+
+    transfer-service:
+      path: /transfers/**
+      serviceId: transfer-service
       stripPrefix: false
 
 server:

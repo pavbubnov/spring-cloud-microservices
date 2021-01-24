@@ -20,12 +20,12 @@ public class PaymentController {
     }
 
     @PostMapping("/payments")
-    public PaymentResponseDTO deposit(@RequestBody PaymentRequestDTO requestDTO) {
+    public PaymentResponseDTO payment(@RequestBody PaymentRequestDTO requestDTO) {
         return paymentService.payment(requestDTO.getAccountId(), requestDTO.getBillId(), requestDTO.getAmount());
     }
 
     @GetMapping("/payments/{paymentId}")
-    public PaymentResponseDTO getDeposit(@PathVariable Long paymentId) {
+    public PaymentResponseDTO getPayment(@PathVariable Long paymentId) {
         return new PaymentResponseDTO(paymentService.getPaymentById(paymentId));
     }
 

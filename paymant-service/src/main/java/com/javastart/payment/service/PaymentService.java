@@ -82,8 +82,8 @@ public class PaymentService {
                         "payment with id " + paymentId));
     }
 
-    public List<Payment> getPaymentsByBillId(Long accountId) {
-        return paymentRepository.getPaymentByBillId(accountId);
+    public List<Payment> getPaymentsByBillId(Long billId) {
+        return paymentRepository.getPaymentByBillId(billId);
     }
 
     private BillRequestDTO createBillRequest(BigDecimal amount, BillResponseDTO billResponseDTO) {

@@ -34,9 +34,10 @@ public class BillService {
                 .orElseThrow(() -> new BillNotFoundException("Unable to find bill with id: " + billId));
     }
 
-    public Long createBill(Long accountId, Long billId, BigDecimal amount, Boolean isDefault, Boolean overdraftEnabled) {
+    public Long createBill(Long accountId, Long billId, BigDecimal amount, Boolean isDefault, Boolean overdraftEnabled)
+            throws FeignException {
 
-        try {
+       //try {
             AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(accountId);
 
             if (!accountResponseDTO.getBills().contains(billId)) {
@@ -58,9 +59,9 @@ public class BillService {
             Bill bill = new Bill(accountId, billId, amount, isDefault, OffsetDateTime.now(), overdraftEnabled);
             return billRepository.save(bill).getBillId();
 
-        } catch (FeignException feignException) {
-            throw new BillNotFoundException("Unable to find account with id: " + accountId);
-        }
+       // } catch (FeignException feignException) {
+       //     throw new BillNotFoundException("Unable to find account with id: " + accountId);
+       // }
     }
 
     public Bill updateBill(Long billId, Long accountId, BigDecimal amount,
@@ -81,7 +82,7 @@ public class BillService {
         }
 
         Bill bill = new Bill(accountId, billId, amount, isDefault,
-                getBillById(accountId).getCreationDate(), overdraftEnabled);
+                getBillById(billId).getCreationDate(), overdraftEnabled);
         return billRepository.save(bill);
     }
 
