@@ -12,9 +12,11 @@ spring:
     password: admin
     driver-class-name: org.postgresql.Driver
 
+
 server:
   servlet:
     context-path: /accounts
   port: 8081
-  error:
-    include-message: always
+#  error:
+#    include-message: always
+#    include-stacktrace: never

@@ -4,12 +4,15 @@ import com.javastart.deposit.controller.dto.DepositRequestDTO;
 import com.javastart.deposit.controller.dto.DepositResponseDTO;
 import com.javastart.deposit.service.DepositService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Validated
 public class DepositController {
 
     private final DepositService depositService;
@@ -20,7 +23,7 @@ public class DepositController {
     }
 
     @PostMapping("/deposits")
-    public DepositResponseDTO deposit(@RequestBody DepositRequestDTO requestDTO) {
+    public DepositResponseDTO deposit(@Valid @RequestBody DepositRequestDTO requestDTO) {
         return depositService.deposit(requestDTO.getAccountId(), requestDTO.getBillId(), requestDTO.getAmount());
     }
 

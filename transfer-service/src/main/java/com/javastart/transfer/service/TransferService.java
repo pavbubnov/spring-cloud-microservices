@@ -87,11 +87,7 @@ public class TransferService {
 
                 AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(billResponseDTO.getAccountId());
                 billServiceClient.update(billId, billRequestDTO);
-                if (isDeposit) {
-                    ActionManager.setDepositSucceed(true);
-                } else {
-                    ActionManager.setPaymentSucceed(true);
-                }
+                setSuccessFlag(isDeposit);
                 availableAmount = billRequestDTO.getAmount();
                 return createResponse(billId, amount, accountResponseDTO, availableAmount, isDeposit);
 
@@ -103,6 +99,7 @@ public class TransferService {
         BillResponseDTO defaultBill = getDefaultBill(accountId);
         BillRequestDTO billRequestDTO = createBillRequest(amount, defaultBill, isDeposit);
         billServiceClient.update(defaultBill.getBillId(), billRequestDTO);
+        setSuccessFlag(isDeposit);
         AccountResponseDTO account = accountServiceClient.getAccountById(accountId);
         availableAmount = billRequestDTO.getAmount();
         return createResponse(defaultBill.getBillId(), amount, account, availableAmount, isDeposit);
@@ -174,4 +171,11 @@ public class TransferService {
         return transferRepository.getTransfersByRecipientBillId(recipientBillId);
     }
 
+    private void setSuccessFlag(Boolean isDeposit) {
+        if (isDeposit) {
+            ActionManager.setDepositSucceed(true);
+        } else {
+            ActionManager.setPaymentSucceed(true);
+        }
+    }
 }

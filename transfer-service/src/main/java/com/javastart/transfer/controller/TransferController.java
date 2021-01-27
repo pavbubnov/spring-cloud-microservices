@@ -7,12 +7,15 @@ import com.javastart.transfer.entity.Transfer;
 import com.javastart.transfer.exception.TransferServiceException;
 import com.javastart.transfer.service.TransferService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
+@Validated
 public class TransferController {
 
     private final TransferService transfeService;
@@ -23,7 +26,7 @@ public class TransferController {
     }
 
     @PostMapping("/transfers")
-    public TransferResponseDTO transfer(@RequestBody TransferRequestDTO transferRequestDTO) {
+    public TransferResponseDTO transfer(@Valid @RequestBody TransferRequestDTO transferRequestDTO) {
 
         try {
             TransferResponseDTO transferResponseDTO = transfeService.transfer(transferRequestDTO);

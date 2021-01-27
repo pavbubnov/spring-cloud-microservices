@@ -4,12 +4,15 @@ import com.javastart.bill.controller.dto.BillRequestDTO;
 import com.javastart.bill.controller.dto.BillResponseDTO;
 import com.javastart.bill.service.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Validated
 public class BillController {
 
     private final BillService billService;
@@ -25,13 +28,13 @@ public class BillController {
     }
 
     @PostMapping("/")
-    public Long createBill(@RequestBody BillRequestDTO billRequestDTO) {
+    public Long createBill(@Valid @RequestBody BillRequestDTO billRequestDTO) {
         return billService.createBill(billRequestDTO.getAccountId(), billRequestDTO.getBillId(), billRequestDTO.getAmount(),
                 billRequestDTO.getIsDefault(), billRequestDTO.getOverdraftEnabled());
     }
 
     @PutMapping("/{billId}")
-    public BillResponseDTO updateBill(@PathVariable Long billId,
+    public BillResponseDTO updateBill(@PathVariable Long billId, @Valid
                                       @RequestBody BillRequestDTO billRequestDTO) {
         return new BillResponseDTO(billService.updateBill(billId, billRequestDTO.getAccountId(),
                 billRequestDTO.getAmount(), billRequestDTO.getIsDefault(), billRequestDTO.getOverdraftEnabled()));

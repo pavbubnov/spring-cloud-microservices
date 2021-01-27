@@ -67,6 +67,10 @@ public class BillService {
     public Bill updateBill(Long billId, Long accountId, BigDecimal amount,
                            Boolean isDefault, Boolean overdraftEnabled) {
 
+        if (billId == null) {
+            throw new BillNotFoundException("Enter bill id");
+        }
+
         List<Bill> billsList = getBillsByAccountId(accountId);
 
         if (!getExistenceBillIdList(accountId).contains(billId)) {
