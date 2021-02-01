@@ -2,7 +2,7 @@ package com.javastart.account.service;
 
 import com.javastart.account.entity.Account;
 import com.javastart.account.exception.AccountNotFoundException;
-import com.javastart.account.exception.CreateBillExcepiton;
+import com.javastart.account.exception.CreateBillExceptiton;
 import com.javastart.account.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
@@ -35,7 +34,10 @@ public class AccountService {
         checkBillsId(bills);
         addToGeneralBillList(bills);
         System.out.println("after:" + numberOfBills.toString());
-        return accountRepository.save(account).getAccountId();
+
+        Long id = accountRepository.save(account).getAccountId();
+
+        return id;
     }
 
     public Account updateAccount(Long accountId, String name,
@@ -87,7 +89,7 @@ public class AccountService {
         for (int k = 0; k < bills.size(); k++) {
             for (int z = k + 1; z < bills.size(); z++) {
                 if (bills.get(k) == bills.get(z)) {
-                    throw new CreateBillExcepiton("You have equals bills, please, check");
+                    throw new CreateBillExceptiton("You have equals bills, please, check");
                 }
             }
         }
@@ -101,7 +103,7 @@ public class AccountService {
             }
         }
         if (flagOfRepeatingBills) {
-            throw new CreateBillExcepiton("There is(are) bills with id :" + numberOfRepeatingBills);
+            throw new CreateBillExceptiton("There is(are) bills with id :" + numberOfRepeatingBills);
         }
     }
 
