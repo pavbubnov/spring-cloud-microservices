@@ -19,6 +19,4 @@ public class AccountUtils {
         return account;
     }
 
-
-
 }

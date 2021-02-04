@@ -1,15 +1,14 @@
-package com.javastart.depositservice.controller;
+package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javastart.deposit.DepositApplication;
-import com.javastart.deposit.controller.dto.DepositResponseDTO;
-import com.javastart.deposit.entity.Deposit;
-import com.javastart.deposit.repository.DepositRepository;
-import com.javastart.deposit.rest.AccountServiceClient;
-import com.javastart.deposit.rest.BillResponseDTO;
-import com.javastart.deposit.rest.BillServiceClient;
-import com.javastart.depositservice.config.SpringH2DatabaseConfig;
-import com.javastart.depositservice.util.DepositUtil;
+import com.javastart.transfer.TransferApplication;
+import com.javastart.transfer.controller.dto.TransferResponseDTO;
+import com.javastart.transfer.entity.Transfer;
+import com.javastart.transfer.repository.TransferRepository;
+import com.javastart.transfer.rest.AccountServiceClient;
+import com.javastart.transfer.rest.BillResponseDTO;
+import com.javastart.transfer.rest.BillServiceClient;
+import config.SpringH2DatabaseConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,18 +34,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DepositApplication.class, SpringH2DatabaseConfig.class})
-public class DepositControllerTest {
-
-    //будет запускаться приложение, и мы будем выполнять запрос
+@SpringBootTest(classes = {TransferApplication.class, SpringH2DatabaseConfig.class})
+public class TransferControllerTest {
 
     private MockMvc mockMvc;
 
     @Autowired
-    private WebApplicationContext context; //тестовый контекст
+    private WebApplicationContext context;
 
-    @Autowired //тк база данных уже есть
-    private DepositRepository depositRepository;
+    @Autowired
+    private TransferRepository transferRepository;
 
     @MockBean
     private BillServiceClient billServiceClient;
@@ -57,7 +54,6 @@ public class DepositControllerTest {
     @MockBean
     private RabbitTemplate rabbitTemplate;
 
-    //инициализация MockMvc
 
     @Before //перед тестом
     public void setup() {
@@ -65,31 +61,37 @@ public class DepositControllerTest {
     }
 
     private static final String REQUEST = "{\n" +
-            "    \"billId\": 1,\n" +
-            "    \"amount\": 3000\n" +
+            "    \"senderBillId\": 3,\n" +
+            "    \"recipientBillId\": 4,\n" +
+            "    \"amount\": 3000.00\n" +
             "}";
 
     @Test
     public void createDeposit() throws Exception {
-        BillResponseDTO billResponseDTO = DepositUtil.createBillResponseDTO(
-                1l, 1000l, 1l, true, true);
-        Mockito.when(billServiceClient.getBillById(ArgumentMatchers.anyLong())).thenReturn(billResponseDTO);
-        Mockito.when(accountServiceClient.getAccountById(ArgumentMatchers.anyLong()))
-                .thenReturn(DepositUtil.createAccountResponseDTO(1l, Arrays.asList(1l, 2l, 3l),
+
+
+        Mockito.when(billServiceClient.getBillById(3l)).thenReturn(
+                TransferUtil.createBillResponseDTO(
+                        1l, 5000l, 3l, true, true));
+        Mockito.when(billServiceClient.getBillById(4l)).thenReturn(
+                TransferUtil.createBillResponseDTO(
+                        1l, 5000l, 4l, true, true));
+        Mockito.when(accountServiceClient.getAccountById(1l))
+                .thenReturn(TransferUtil.createAccountResponseDTO(1l, Arrays.asList(3l, 4l, 10l),
                         "lory.cat@xyz", "Lori", "+123456"));
-        MvcResult mvcResult = mockMvc.perform(post("/deposits")
+        MvcResult mvcResult = mockMvc.perform(post("/transfers")
                 .content(REQUEST).contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status()
                 .isOk())
                 .andReturn();
 
         String body = mvcResult.getResponse().getContentAsString();
-        List<Deposit> deposits = depositRepository.findDepositByEmail("lory.cat@xyz");
+        List<Transfer> transfers = transferRepository.getTransfersBySenderBillId(3l);
         ObjectMapper objectMapper = new ObjectMapper();
-        DepositResponseDTO depositResponseDTO = objectMapper.readValue(body, DepositResponseDTO.class);
+        objectMapper.findAndRegisterModules();
+        TransferResponseDTO transferResponseDTO = objectMapper.readValue(body, TransferResponseDTO.class);
 
-        Assertions.assertThat(depositResponseDTO.getMail()).isEqualTo(deposits.get(0).getEmail());
-        Assertions.assertThat(depositResponseDTO.getAmount()).isEqualTo(BigDecimal.valueOf(3000));
+        Assertions.assertThat(transferResponseDTO.getAmount()).isEqualTo(transfers.get(0).getAmount());
     }
 
 }

@@ -29,21 +29,16 @@ public class AccountService {
     }
 
     public Long createAccount(String name, String email, String phone, List<Long> bills) {
-        System.out.println("before:" + numberOfBills.toString());
+
         Account account = new Account(name, email, phone, OffsetDateTime.now(), bills);
         checkBillsId(bills);
         addToGeneralBillList(bills);
-        System.out.println("after:" + numberOfBills.toString());
 
-        Long id = accountRepository.save(account).getAccountId();
-
-        return id;
+        return accountRepository.save(account).getAccountId();
     }
 
     public Account updateAccount(Long accountId, String name,
                                  String email, String phone, List<Long> bills) {
-
-        System.out.println("before:" + numberOfBills.toString());
 
         addToGeneralBillList(createUniqueList(getAccountById(accountId).getBills(), bills, new ArrayList<>()));
 
@@ -55,8 +50,6 @@ public class AccountService {
         account.setName(name);
         account.setCreationDate(getAccountById(accountId).getCreationDate());
 
-        System.out.println("after:" + numberOfBills.toString());
-
         return accountRepository.save(account);
     }
 
@@ -67,7 +60,6 @@ public class AccountService {
     }
 
     public Account addAccountBills(Long accountId, List<Long> additionalBills) {
-        System.out.println("before:" + numberOfBills.toString());
 
         Account account = getAccountById(accountId);
         checkBillsId(additionalBills);
@@ -75,8 +67,6 @@ public class AccountService {
         List<Long> allBills = account.getBills();
         allBills.addAll(additionalBills);
         account.setBills(allBills);
-
-        System.out.println("after:" + numberOfBills.toString());
         return accountRepository.save(account);
     }
 

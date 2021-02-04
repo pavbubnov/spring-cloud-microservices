@@ -32,7 +32,7 @@ public class SpringH2DatabaseConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("com.javastart.depositservice.repository");
+        em.setPackagesToScan("com.javastart.deposit.repository");
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         return em;
     }

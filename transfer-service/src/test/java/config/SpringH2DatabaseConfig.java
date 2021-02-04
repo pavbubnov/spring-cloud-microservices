@@ -1,4 +1,4 @@
-package com.javastart.accounttest.config;
+package config;
 
 
 import org.springframework.context.annotation.Bean;
@@ -32,7 +32,7 @@ public class SpringH2DatabaseConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("com.javastart.accounttest.repository");
+        em.setPackagesToScan("com.javastart.transfer-service.repository");
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         return em;
     }
