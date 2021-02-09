@@ -10,12 +10,12 @@ import java.time.OffsetDateTime;
 @Getter
 public class BillRequestDTO {
 
-    @JsonProperty("accountId")
+    @JsonProperty("account_id")
     @NotNull(message = "Enter account id")
     @Positive(message = "This value must be positive")
     private Long accountId;
 
-    @JsonProperty("billId")
+    @JsonProperty("bill_id")
     @Positive(message = "This value must be positive")
     private Long billId;
 
@@ -24,13 +24,14 @@ public class BillRequestDTO {
     @PositiveOrZero(message = "This value must be positive or 0")
     private BigDecimal amount;
 
-    @JsonProperty("isDefault")
+    @JsonProperty("is_default")
     @NotNull(message = "Do you want to set this bill default or not")
     private Boolean isDefault;
 
+    @JsonProperty("creation_date")
     private OffsetDateTime creationDate;
 
-    @JsonProperty("overdraftEnabled")
+    @JsonProperty("is_overdraft_enabled")
     @NotNull(message = "Do you want to enable overdraft or not")
     private Boolean overdraftEnabled;
 }

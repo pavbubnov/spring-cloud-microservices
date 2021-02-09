@@ -30,7 +30,7 @@ public class PaymentMessageHandler {
         System.out.println(paymentResponseDTO);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(paymentResponseDTO.getMail());
+        mailMessage.setTo(paymentResponseDTO.getEmail());
         mailMessage.setFrom("pavbubnovJava@yandex.ru");
 
         mailMessage.setSubject("Payment");

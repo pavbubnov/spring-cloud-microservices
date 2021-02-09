@@ -13,11 +13,11 @@ import java.math.BigDecimal;
 @Setter
 public class PaymentRequestDTO {
 
-    @JsonProperty("accountId")
+    @JsonProperty("account_id")
     @Positive(message = "This value must be positive")
     private Long accountId;
 
-    @JsonProperty("billId")
+    @JsonProperty("bill_id")
     @Positive(message = "This value must be positive")
     private Long billId;
 

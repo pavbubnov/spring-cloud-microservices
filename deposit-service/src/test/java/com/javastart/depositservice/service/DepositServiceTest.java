@@ -3,7 +3,6 @@ package com.javastart.depositservice.service;
 import com.javastart.deposit.controller.dto.DepositResponseDTO;
 import com.javastart.deposit.exception.DepositServiceException;
 import com.javastart.deposit.repository.DepositRepository;
-import com.javastart.deposit.rest.AccountResponseDTO;
 import com.javastart.deposit.rest.AccountServiceClient;
 import com.javastart.deposit.rest.BillResponseDTO;
 import com.javastart.deposit.rest.BillServiceClient;
@@ -18,10 +17,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -52,7 +49,7 @@ public class DepositServiceTest {
                 .thenReturn(DepositUtil.createAccountResponseDTO(1l, Arrays.asList(1l, 2l, 3l),
                         "lory.cat@xyz", "Lori", "+123456"));
         DepositResponseDTO deposit = depositService.deposit(null, 1L, BigDecimal.valueOf(1000));
-        Assertions.assertThat(deposit.getMail()).isEqualTo("lory.cat@xyz");
+        Assertions.assertThat(deposit.getEmail()).isEqualTo("lory.cat@xyz");
     }
 
     @Test(expected = DepositServiceException.class)

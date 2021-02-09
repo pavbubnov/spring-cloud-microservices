@@ -3,7 +3,6 @@ package com.javastart.transfer.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javastart.transfer.action.ActionManager;
-import com.javastart.transfer.controller.TransferController;
 import com.javastart.transfer.controller.dto.NotificationResponseDTO;
 import com.javastart.transfer.controller.dto.TransferRequestDTO;
 import com.javastart.transfer.controller.dto.TransferResponseDTO;
@@ -15,7 +14,6 @@ import feign.FeignException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -66,12 +64,12 @@ public class TransferService {
 
         NotificationResponseDTO recipientInfo = depositOrPayment(recipientAccountId, recipientBillId, transferRequestDTO.getAmount(), true);
         transferRepository.save(new Transfer(senderInfo.getBillId(), recipientInfo.getBillId(),
-                transferRequestDTO.getAmount(), OffsetDateTime.now(), senderInfo.getMail(), recipientInfo.getMail()));
+                transferRequestDTO.getAmount(), OffsetDateTime.now(), senderInfo.getEmail(), recipientInfo.getEmail()));
 
         resetActionFlag();
 
         return new TransferResponseDTO(senderInfo.getBillId(), recipientInfo.getBillId(),
-                transferRequestDTO.getAmount(), OffsetDateTime.now(), senderInfo.getMail(), recipientInfo.getMail());
+                transferRequestDTO.getAmount(), OffsetDateTime.now(), senderInfo.getEmail(), recipientInfo.getEmail());
     }
 
 

@@ -29,5 +29,6 @@ public class AccountRequestDTO {
     @JsonProperty("bills")
     private List<Long> bills;
 
+    @JsonProperty("creation_date")
     private OffsetDateTime creationDate;
 }

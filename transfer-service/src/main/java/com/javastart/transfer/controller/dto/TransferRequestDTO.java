@@ -14,19 +14,19 @@ import java.time.OffsetDateTime;
 @Getter
 public class TransferRequestDTO {
 
-    @JsonProperty("senderBillId")
+    @JsonProperty("sender_bill_id")
     @Positive(message = "This value must be positive")
     private Long senderBillId;
 
-    @JsonProperty("recipientBillId")
+    @JsonProperty("recipient_bill_id")
     @Positive(message = "This value must be positive")
     private Long recipientBillId;
 
-    @JsonProperty("senderAccountId")
+    @JsonProperty("sender_account_id")
     @Positive(message = "This value must be positive")
     private Long senderAccountId;
 
-    @JsonProperty("recipientAccountId")
+    @JsonProperty("recipient_account_id")
     @Positive(message = "This value must be positive")
     private Long recipientAccountId;
 

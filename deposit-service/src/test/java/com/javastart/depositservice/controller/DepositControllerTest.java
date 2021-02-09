@@ -88,7 +88,7 @@ public class DepositControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         DepositResponseDTO depositResponseDTO = objectMapper.readValue(body, DepositResponseDTO.class);
 
-        Assertions.assertThat(depositResponseDTO.getMail()).isEqualTo(deposits.get(0).getEmail());
+        Assertions.assertThat(depositResponseDTO.getEmail()).isEqualTo(deposits.get(0).getEmail());
         Assertions.assertThat(depositResponseDTO.getAmount()).isEqualTo(BigDecimal.valueOf(3000));
     }
 
