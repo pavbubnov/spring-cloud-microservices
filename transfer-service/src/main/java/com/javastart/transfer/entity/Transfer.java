@@ -33,7 +33,8 @@ public class Transfer {
 
     private String recipientEmail;
 
-    public Transfer(Long senderBillId, Long recipientBillId, BigDecimal amount, OffsetDateTime creationDate, String senderEmail, String recipientEmail) {
+    public Transfer(Long senderBillId, Long recipientBillId, BigDecimal amount, OffsetDateTime creationDate,
+                    String senderEmail, String recipientEmail) {
         this.senderBillId = senderBillId;
         this.recipientBillId = recipientBillId;
         this.amount = amount;

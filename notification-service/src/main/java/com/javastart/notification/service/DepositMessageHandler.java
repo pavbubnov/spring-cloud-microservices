@@ -34,7 +34,8 @@ public class DepositMessageHandler {
         mailMessage.setFrom("pavbubnovJava@yandex.ru");
 
         mailMessage.setSubject("Deposit");
-        mailMessage.setText("Make deposit, sum:" + depositResponseDTO.getAmount() + ", available now: " + depositResponseDTO.getAvailableAmount());
+        mailMessage.setText("Make deposit, sum:" + depositResponseDTO.getAmount() + ", available now: " +
+                depositResponseDTO.getAvailableAmount());
 
         try {
             javaMailSender.send(mailMessage);

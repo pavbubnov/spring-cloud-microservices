@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,17 +20,24 @@ import java.util.stream.Collectors;
 public class BillServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid (MethodArgumentNotValidException ex,
-                                                                   HttpHeaders headers, HttpStatus status,
-                                                                   WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers, HttpStatus status,
+                                                                  WebRequest request) {
         BindingResult result = ex.getBindingResult();
-        List<String> errors = result.getFieldErrors().stream().map(objectError -> ((FieldError) objectError).getDefaultMessage()).collect(Collectors.toList());
-        return new ResponseEntity<>(new ValidateException(errors), HttpStatus.BAD_REQUEST);
+        List<String> errors = result.getFieldErrors().stream().map(objectError ->
+                ((FieldError) objectError).getDefaultMessage()).collect(Collectors.toList());
+
+        List<String> fields = result.getFieldErrors().stream().map(objectError ->
+                ((FieldError) objectError).getField()).collect(Collectors.toList());
+
+        return new ResponseEntity<>(new ValidateException(fields, OffsetDateTime.now(),
+                errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({BillNotFoundException.class})
     public ResponseEntity<HandlerBillException> handleBillNotFoundException(BillNotFoundException ex) {
-        return new ResponseEntity<>(new HandlerBillException(ex.getMessage()),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new HandlerBillException(ex.getMessage(), OffsetDateTime.now()),
+                HttpStatus.NOT_FOUND);
     }
 
 }

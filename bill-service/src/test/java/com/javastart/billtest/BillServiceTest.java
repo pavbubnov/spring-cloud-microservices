@@ -59,8 +59,6 @@ public class BillServiceTest {
         });
         assertTrue(throwable2.getMessage().equals("Bill with id: " + 3l + " is already exists"));
 
-        //проверить логику присвоения дефолтного била без ее повторения тут не получится
-
         Throwable throwable3 = assertThrows(BillNotFoundException.class, () -> {
             billService.getBillById(4l);
         });

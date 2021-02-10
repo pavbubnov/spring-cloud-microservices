@@ -9,11 +9,9 @@ import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,31 +35,27 @@ public class BillService {
     public Long createBill(Long accountId, Long billId, BigDecimal amount, Boolean isDefault, Boolean overdraftEnabled)
             throws FeignException {
 
-       //try {
-            AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(accountId);
+        AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(accountId);
 
-            if (!accountResponseDTO.getBills().contains(billId)) {
-                throw new BillNotFoundException("Account with id: " + accountId + " doesn't contain bill with id: " + billId);
-            }
+        if (!accountResponseDTO.getBills().contains(billId)) {
+            throw new BillNotFoundException("Account with id: " + accountId + " doesn't contain bill with id: " + billId);
+        }
 
-            List<Bill> billsList = getBillsByAccountId(accountId);
+        List<Bill> billsList = getBillsByAccountId(accountId);
 
-            if (getExistenceBillIdList(accountId).contains(billId)) {
-                throw new BillNotFoundException("Bill with id: " + billId + " is already exists");
-            }
+        if (getExistenceBillIdList(accountId).contains(billId)) {
+            throw new BillNotFoundException("Bill with id: " + billId + " is already exists");
+        }
 
-            if (billsList.size() == 0) {
-                isDefault = true;
-            } else if (isDefault) {
-                reDefaultBill(billsList);
-            }
+        if (billsList.size() == 0) {
+            isDefault = true;
+        } else if (isDefault) {
+            reDefaultBill(billsList);
+        }
 
-            Bill bill = new Bill(accountId, billId, amount, isDefault, OffsetDateTime.now(), overdraftEnabled);
-            return billRepository.save(bill).getBillId();
+        Bill bill = new Bill(accountId, billId, amount, isDefault, OffsetDateTime.now(), overdraftEnabled);
+        return billRepository.save(bill).getBillId();
 
-       // } catch (FeignException feignException) {
-       //     throw new BillNotFoundException("Unable to find account with id: " + accountId);
-       // }
     }
 
     public Bill updateBill(Long billId, Long accountId, BigDecimal amount,

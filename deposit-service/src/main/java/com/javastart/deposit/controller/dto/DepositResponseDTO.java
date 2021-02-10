@@ -27,7 +27,7 @@ public class DepositResponseDTO {
     @JsonProperty("available_amount")
     private BigDecimal availableAmount;
 
-    public DepositResponseDTO (Deposit deposit) {
+    public DepositResponseDTO(Deposit deposit) {
         billId = deposit.getBillId();
         amount = deposit.getAmount();
         email = deposit.getEmail();

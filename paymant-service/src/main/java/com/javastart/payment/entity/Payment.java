@@ -33,7 +33,8 @@ public class Payment {
 
     private BigDecimal availableAmount;
 
-    public Payment(BigDecimal amount, Long billId, OffsetDateTime creationDate, String email, BigDecimal availableAmount) {
+    public Payment(BigDecimal amount, Long billId, OffsetDateTime creationDate, String email,
+                   BigDecimal availableAmount) {
         this.amount = amount;
         this.billId = billId;
         this.creationDate = creationDate;

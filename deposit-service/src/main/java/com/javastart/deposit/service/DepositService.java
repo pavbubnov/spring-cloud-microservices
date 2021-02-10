@@ -56,7 +56,8 @@ public class DepositService {
                 billServiceClient.update(billId, billRequestDTO);
                 availableAmount = billRequestDTO.getAmount();
 
-                AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(billResponseDTO.getAccountId());
+                AccountResponseDTO accountResponseDTO = accountServiceClient
+                        .getAccountById(billResponseDTO.getAccountId());
                 depositRepository.save(new Deposit(amount, billId, OffsetDateTime.now(), accountResponseDTO.getEmail(),
                         availableAmount));
 
@@ -88,8 +89,10 @@ public class DepositService {
         return depositRepository.getDepositByBillId(billId);
     }
 
-    private DepositResponseDTO createResponse(Long billId, BigDecimal amount, AccountResponseDTO accountResponseDTO, BigDecimal availableAmount) {
-        DepositResponseDTO depositResponseDTO = new DepositResponseDTO(billId, amount, accountResponseDTO.getEmail(), availableAmount);
+    private DepositResponseDTO createResponse(Long billId, BigDecimal amount, AccountResponseDTO accountResponseDTO,
+                                              BigDecimal availableAmount) {
+        DepositResponseDTO depositResponseDTO = new DepositResponseDTO(billId, amount, accountResponseDTO.getEmail(),
+                availableAmount);
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {

@@ -33,7 +33,7 @@ public class DepositController {
     }
 
     @GetMapping("deposits/bill/{billId}")
-    public List<DepositResponseDTO> getDepositsByBillId (@PathVariable Long billId) {
+    public List<DepositResponseDTO> getDepositsByBillId(@PathVariable Long billId) {
         return depositService.getDepositsByBillId(billId).stream().
                 map(DepositResponseDTO::new).
                 collect(Collectors.toList());

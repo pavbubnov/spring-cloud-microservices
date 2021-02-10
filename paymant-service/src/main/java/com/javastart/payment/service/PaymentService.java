@@ -31,7 +31,8 @@ public class PaymentService {
     private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public PaymentService(PaymentRepository paymentRepository, AccountServiceClient accountServiceClient, BillServiceClient billServiceClient, RabbitTemplate rabbitTemplate) {
+    public PaymentService(PaymentRepository paymentRepository, AccountServiceClient accountServiceClient,
+                          BillServiceClient billServiceClient, RabbitTemplate rabbitTemplate) {
         this.paymentRepository = paymentRepository;
         this.accountServiceClient = accountServiceClient;
         this.billServiceClient = billServiceClient;
@@ -52,11 +53,13 @@ public class PaymentService {
                 BillResponseDTO billResponseDTO = billServiceClient.getBillById(billId);
                 BillRequestDTO billRequestDTO = createBillRequest(amount, billResponseDTO);
 
-                AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(billResponseDTO.getAccountId());
+                AccountResponseDTO accountResponseDTO = accountServiceClient
+                        .getAccountById(billResponseDTO.getAccountId());
 
                 billServiceClient.update(billId, billRequestDTO);
                 availableAmount = billRequestDTO.getAmount();
-                paymentRepository.save(new Payment(amount, billId, OffsetDateTime.now(), accountResponseDTO.getEmail(), availableAmount));
+                paymentRepository.save(new Payment(amount, billId, OffsetDateTime.now(),
+                        accountResponseDTO.getEmail(), availableAmount));
 
                 return createResponse(billId, amount, accountResponseDTO, availableAmount);
 
@@ -92,7 +95,8 @@ public class PaymentService {
         billRequestDTO.setCreationDate(billResponseDTO.getCreationDate());
         billRequestDTO.setIsDefault(billResponseDTO.getIsDefault());
         billRequestDTO.setOverdraftEnabled(billResponseDTO.getOverdraftEnabled());
-        if (billResponseDTO.getAmount().subtract(amount).compareTo(BigDecimal.ZERO) != -1 || billResponseDTO.getOverdraftEnabled()) {
+        if (billResponseDTO.getAmount().subtract(amount).compareTo(BigDecimal.ZERO) != -1 ||
+                billResponseDTO.getOverdraftEnabled()) {
             billRequestDTO.setAmount(billResponseDTO.getAmount().subtract(amount));
         } else {
             throw new PaymentServiceException("Insufficient funds, available now: " + billResponseDTO.getAmount());
@@ -108,8 +112,10 @@ public class PaymentService {
                         ". Please, that accountId is correct and call to you bank manager."));
     }
 
-    private PaymentResponseDTO createResponse(Long billId, BigDecimal amount, AccountResponseDTO accountResponseDTO, BigDecimal availableAmount) {
-        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(billId, amount, accountResponseDTO.getEmail(), availableAmount);
+    private PaymentResponseDTO createResponse(Long billId, BigDecimal amount, AccountResponseDTO accountResponseDTO,
+                                              BigDecimal availableAmount) {
+        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(billId, amount, accountResponseDTO.getEmail(),
+                availableAmount);
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {

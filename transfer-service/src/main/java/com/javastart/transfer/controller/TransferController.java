@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -33,8 +32,8 @@ public class TransferController {
             return transferResponseDTO;
         } catch (TransferServiceException exception) {
             if (ActionManager.getPaymentSucceed() && !ActionManager.getDepositSucceed()) {
-                transfeService.depositOrPayment(transferRequestDTO.getSenderAccountId(), transferRequestDTO.getSenderBillId(),
-                        transferRequestDTO.getAmount(), true);
+                transfeService.depositOrPayment(transferRequestDTO.getSenderAccountId(),
+                        transferRequestDTO.getSenderBillId(), transferRequestDTO.getAmount(), true);
                 transfeService.resetActionFlag();
                 throw new TransferServiceException(exception.getMessage() + ". Deposit rollback");
             }
@@ -44,7 +43,7 @@ public class TransferController {
     }
 
     @GetMapping("/transfers/{transferId}")
-    public Transfer getTransferById (@PathVariable Long transferId) {
+    public Transfer getTransferById(@PathVariable Long transferId) {
         return transfeService.getTransferById(transferId);
     }
 

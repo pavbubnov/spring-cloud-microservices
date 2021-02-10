@@ -6,14 +6,12 @@ import com.javastart.transfer.controller.dto.TransferResponseDTO;
 import com.javastart.transfer.entity.Transfer;
 import com.javastart.transfer.repository.TransferRepository;
 import com.javastart.transfer.rest.AccountServiceClient;
-import com.javastart.transfer.rest.BillResponseDTO;
 import com.javastart.transfer.rest.BillServiceClient;
 import config.SpringH2DatabaseConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,7 +52,7 @@ public class TransferControllerTest {
     private RabbitTemplate rabbitTemplate;
 
 
-    @Before //перед тестом
+    @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }

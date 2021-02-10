@@ -34,7 +34,8 @@ public class PaymentMessageHandler {
         mailMessage.setFrom("pavbubnovJava@yandex.ru");
 
         mailMessage.setSubject("Payment");
-        mailMessage.setText("Make payment, sum:" + paymentResponseDTO.getAmount() + ", available now: " + paymentResponseDTO.getAvailableAmount());
+        mailMessage.setText("Make payment, sum:" + paymentResponseDTO.getAmount() + ", available now: " +
+                paymentResponseDTO.getAvailableAmount());
 
         try {
             javaMailSender.send(mailMessage);

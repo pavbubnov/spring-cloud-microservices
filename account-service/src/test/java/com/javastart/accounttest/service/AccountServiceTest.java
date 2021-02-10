@@ -55,10 +55,12 @@ public class AccountServiceTest {
 
         Assertions.assertThat(accountService.getAccountById(1l).getName()).isEqualTo("Lori");
         Assertions.assertThat(accountService.getAccountById(1l).getAccountId()).isEqualTo(1l);
-        Assertions.assertThat(accountService.getAccountById(1l).getBills()).containsExactlyElementsOf(Arrays.asList(3l, 4l, 10l));
+        Assertions.assertThat(accountService.getAccountById(1l).getBills())
+                .containsExactlyElementsOf(Arrays.asList(3l, 4l, 10l));
         Assertions.assertThat(accountService.getAccountById(1l).getEmail()).isEqualTo("Lori@cat.xyz");
         Assertions.assertThat(accountService.getAccountById(1l).getPhone()).isEqualTo("+123456");
-        Assertions.assertThat(accountService.getAccountById(1l).getCreationDate()).isEqualTo(accountReturn.getCreationDate());
+        Assertions.assertThat(accountService.getAccountById(1l).getCreationDate())
+                .isEqualTo(accountReturn.getCreationDate());
 
         Throwable throwable3 = assertThrows(AccountNotFoundException.class, () -> {
             accountService.getAccountById(2l);

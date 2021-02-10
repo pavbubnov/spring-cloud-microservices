@@ -17,6 +17,4 @@ server:
   servlet:
     context-path: /accounts
   port: 8081
-#  error:
-#    include-message: always
-#    include-stacktrace: never
+

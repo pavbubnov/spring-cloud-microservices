@@ -29,13 +29,13 @@ public class BillController {
 
     @PostMapping("/")
     public Long createBill(@Valid @RequestBody BillRequestDTO billRequestDTO) {
-        return billService.createBill(billRequestDTO.getAccountId(), billRequestDTO.getBillId(), billRequestDTO.getAmount(),
-                billRequestDTO.getIsDefault(), billRequestDTO.getOverdraftEnabled());
+        return billService.createBill(billRequestDTO.getAccountId(), billRequestDTO.getBillId(),
+                billRequestDTO.getAmount(), billRequestDTO.getIsDefault(), billRequestDTO.getOverdraftEnabled());
     }
 
     @PutMapping("/{billId}")
     public BillResponseDTO updateBill(@PathVariable Long billId, @Valid
-                                      @RequestBody BillRequestDTO billRequestDTO) {
+    @RequestBody BillRequestDTO billRequestDTO) {
         return new BillResponseDTO(billService.updateBill(billId, billRequestDTO.getAccountId(),
                 billRequestDTO.getAmount(), billRequestDTO.getIsDefault(), billRequestDTO.getOverdraftEnabled()));
     }

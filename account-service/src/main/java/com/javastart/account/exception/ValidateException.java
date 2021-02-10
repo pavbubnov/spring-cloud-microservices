@@ -4,13 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-@Getter //добавил
+@Getter
 public class ValidateException {
 
+    private List<String> field;
+
+    private OffsetDateTime time;
+
     private List<String> message;
+
 
 }

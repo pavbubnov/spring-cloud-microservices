@@ -32,8 +32,6 @@ public class DepositServiceTest {
     private BillServiceClient billServiceClient;
     @Mock
     private RabbitTemplate rabbitTemplate;
-    //mock не знает, что вернуть при вызове метода
-
 
     @InjectMocks
     private DepositService depositService;

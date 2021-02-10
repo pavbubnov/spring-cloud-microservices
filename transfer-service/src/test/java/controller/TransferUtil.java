@@ -9,8 +9,8 @@ import java.util.List;
 
 public class TransferUtil {
 
-    public static AccountResponseDTO createAccountResponseDTO(Long accountId, List<Long> bills, String email, String name,
-                                                       String phone) {
+    public static AccountResponseDTO createAccountResponseDTO(Long accountId, List<Long> bills, String email,
+                                                              String name, String phone) {
         AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
         accountResponseDTO.setAccountId(accountId);
         accountResponseDTO.setBills(bills);
@@ -22,7 +22,7 @@ public class TransferUtil {
     }
 
     public static BillResponseDTO createBillResponseDTO(Long accountId, Long amount, Long billId, Boolean isDefault,
-                                                 Boolean isOverdraftEnabled) {
+                                                        Boolean isOverdraftEnabled) {
         BillResponseDTO billResponseDTO = new BillResponseDTO();
         billResponseDTO.setAccountId(accountId);
         billResponseDTO.setAmount(BigDecimal.valueOf(amount));

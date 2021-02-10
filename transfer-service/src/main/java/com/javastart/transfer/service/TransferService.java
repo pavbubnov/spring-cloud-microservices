@@ -36,7 +36,8 @@ public class TransferService {
     private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public TransferService(TransferRepository transferRepository, AccountServiceClient accountServiceClient, BillServiceClient billServiceClient, RabbitTemplate rabbitTemplate) {
+    public TransferService(TransferRepository transferRepository, AccountServiceClient accountServiceClient,
+                           BillServiceClient billServiceClient, RabbitTemplate rabbitTemplate) {
         this.transferRepository = transferRepository;
         this.accountServiceClient = accountServiceClient;
         this.billServiceClient = billServiceClient;
@@ -60,9 +61,11 @@ public class TransferService {
             throw new TransferServiceException("Recipient id is null and recipientId is null");
         }
 
-        NotificationResponseDTO senderInfo = depositOrPayment(senderAccountId, senderBillId, transferRequestDTO.getAmount(), false);
+        NotificationResponseDTO senderInfo = depositOrPayment(senderAccountId, senderBillId,
+                transferRequestDTO.getAmount(), false);
 
-        NotificationResponseDTO recipientInfo = depositOrPayment(recipientAccountId, recipientBillId, transferRequestDTO.getAmount(), true);
+        NotificationResponseDTO recipientInfo = depositOrPayment(recipientAccountId, recipientBillId,
+                transferRequestDTO.getAmount(), true);
         transferRepository.save(new Transfer(senderInfo.getBillId(), recipientInfo.getBillId(),
                 transferRequestDTO.getAmount(), OffsetDateTime.now(), senderInfo.getEmail(), recipientInfo.getEmail()));
 
@@ -83,7 +86,8 @@ public class TransferService {
                 BillResponseDTO billResponseDTO = billServiceClient.getBillById(billId);
                 BillRequestDTO billRequestDTO = createBillRequest(amount, billResponseDTO, isDeposit);
 
-                AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(billResponseDTO.getAccountId());
+                AccountResponseDTO accountResponseDTO = accountServiceClient
+                        .getAccountById(billResponseDTO.getAccountId());
                 billServiceClient.update(billId, billRequestDTO);
                 setSuccessFlag(isDeposit);
                 availableAmount = billRequestDTO.getAmount();
@@ -104,9 +108,11 @@ public class TransferService {
 
     }
 
-    private NotificationResponseDTO createResponse(Long billId, BigDecimal amount, AccountResponseDTO accountResponseDTO, BigDecimal availableAmount,
+    private NotificationResponseDTO createResponse(Long billId, BigDecimal amount,
+                                                   AccountResponseDTO accountResponseDTO, BigDecimal availableAmount,
                                                    Boolean isDeposit) {
-        NotificationResponseDTO notificationResponseDTO = new NotificationResponseDTO(billId, amount, accountResponseDTO.getEmail(), availableAmount);
+        NotificationResponseDTO notificationResponseDTO = new NotificationResponseDTO(billId, amount,
+                accountResponseDTO.getEmail(), availableAmount);
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -133,7 +139,8 @@ public class TransferService {
         if (isDeposit) {
             billRequestDTO.setAmount(billResponseDTO.getAmount().add(amount));
         } else {
-            if (billResponseDTO.getAmount().subtract(amount).compareTo(BigDecimal.ZERO) != -1 || billResponseDTO.getOverdraftEnabled()) {
+            if (billResponseDTO.getAmount().subtract(amount).compareTo(BigDecimal.ZERO) != -1 ||
+                    billResponseDTO.getOverdraftEnabled()) {
                 billRequestDTO.setAmount(billResponseDTO.getAmount().subtract(amount));
             } else {
                 throw new TransferServiceException("Insufficient funds, available now: " + billResponseDTO.getAmount());
@@ -147,8 +154,8 @@ public class TransferService {
         return billServiceClient.getBillsByAccountId(accountId).stream()
                 .filter(BillResponseDTO::getIsDefault)
                 .findAny()
-                .orElseThrow(() -> new TransferServiceException("Unable to find default bill for account: " + accountId +
-                        ". Please, that accountId is correct and call to you bank manager."));
+                .orElseThrow(() -> new TransferServiceException("Unable to find default bill for account: " +
+                        accountId + ". Please, that accountId is correct and call to you bank manager."));
     }
 
     public void resetActionFlag() {

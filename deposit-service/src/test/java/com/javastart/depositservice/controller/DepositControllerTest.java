@@ -38,14 +38,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {DepositApplication.class, SpringH2DatabaseConfig.class})
 public class DepositControllerTest {
 
-    //будет запускаться приложение, и мы будем выполнять запрос
 
     private MockMvc mockMvc;
 
     @Autowired
-    private WebApplicationContext context; //тестовый контекст
+    private WebApplicationContext context;
 
-    @Autowired //тк база данных уже есть
+    @Autowired
     private DepositRepository depositRepository;
 
     @MockBean
@@ -57,9 +56,7 @@ public class DepositControllerTest {
     @MockBean
     private RabbitTemplate rabbitTemplate;
 
-    //инициализация MockMvc
-
-    @Before //перед тестом
+    @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
