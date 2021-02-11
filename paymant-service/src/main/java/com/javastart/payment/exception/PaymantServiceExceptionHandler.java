@@ -35,7 +35,7 @@ public class PaymantServiceExceptionHandler extends ResponseEntityExceptionHandl
     }
 
     @ExceptionHandler({PaymentServiceException.class})
-    public ResponseEntity<HandlerPaymentException> handleBillNotFoundException(PaymentServiceException ex) {
+    public ResponseEntity<HandlerPaymentException> paymentServiceException(PaymentServiceException ex) {
         return new ResponseEntity<>(new HandlerPaymentException(ex.getMessage(), OffsetDateTime.now()),
                 HttpStatus.NOT_FOUND);
     }

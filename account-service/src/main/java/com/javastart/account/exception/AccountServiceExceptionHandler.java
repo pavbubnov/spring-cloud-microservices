@@ -38,13 +38,13 @@ public class AccountServiceExceptionHandler extends ResponseEntityExceptionHandl
 
     @ExceptionHandler({AccountNotFoundException.class})
     public ResponseEntity<HandlerAccountException> handleAccountNotFoundException(AccountNotFoundException ex) {
-        return new ResponseEntity<>(new HandlerAccountException(ex.getMessage(), OffsetDateTime.now()),
-                HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new HandlerAccountException(ex.getMessage(), OffsetDateTime.now(),
+                ex.getClass().getSimpleName()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({CreateBillExceptiton.class})
     public ResponseEntity<HandlerAccountException> handleAccountNotFoundException(CreateBillExceptiton ex) {
-        return new ResponseEntity<>(new HandlerAccountException(ex.getMessage(), OffsetDateTime.now()),
-                HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new HandlerAccountException(ex.getMessage(), OffsetDateTime.now(),
+                ex.getClass().getSimpleName()), HttpStatus.NOT_FOUND);
     }
 }

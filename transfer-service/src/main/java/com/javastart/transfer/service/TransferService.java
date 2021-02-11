@@ -7,7 +7,8 @@ import com.javastart.transfer.controller.dto.NotificationResponseDTO;
 import com.javastart.transfer.controller.dto.TransferRequestDTO;
 import com.javastart.transfer.controller.dto.TransferResponseDTO;
 import com.javastart.transfer.entity.Transfer;
-import com.javastart.transfer.exception.TransferServiceException;
+import com.javastart.transfer.exception.NoRollbackException;
+import com.javastart.transfer.exception.TransferNotSucceedException;
 import com.javastart.transfer.repository.TransferRepository;
 import com.javastart.transfer.rest.*;
 import feign.FeignException;
@@ -44,7 +45,7 @@ public class TransferService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public TransferResponseDTO transfer(TransferRequestDTO transferRequestDTO) {
+    public TransferResponseDTO transfer(TransferRequestDTO transferRequestDTO) throws TransferNotSucceedException {
 
 
         Long senderAccountId = transferRequestDTO.getSenderAccountId();
@@ -54,11 +55,11 @@ public class TransferService {
         Boolean isDeposit;
 
         if (senderAccountId == null && senderBillId == null) {
-            throw new TransferServiceException("Sender id is null and recipientId is null");
+            throw new TransferNotSucceedException("Sender id is null and recipientId is null");
         }
 
         if (recipientAccountId == null && recipientBillId == null) {
-            throw new TransferServiceException("Recipient id is null and recipientId is null");
+            throw new TransferNotSucceedException("Recipient id is null and recipientId is null");
         }
 
         NotificationResponseDTO senderInfo = depositOrPayment(senderAccountId, senderBillId,
@@ -76,7 +77,8 @@ public class TransferService {
     }
 
 
-    public NotificationResponseDTO depositOrPayment(Long accountId, Long billId, BigDecimal amount, Boolean isDeposit) {
+    public NotificationResponseDTO depositOrPayment(Long accountId, Long billId, BigDecimal amount, Boolean isDeposit)
+            throws TransferNotSucceedException {
 
         BigDecimal availableAmount;
 
@@ -94,7 +96,7 @@ public class TransferService {
                 return createResponse(billId, amount, accountResponseDTO, availableAmount, isDeposit);
 
             } catch (FeignException feignException) {
-                throw new TransferServiceException("Unable to find bill with id: " + billId);
+                throw new TransferNotSucceedException("Unable to find bill with id: " + billId);
             }
         }
 
@@ -110,7 +112,7 @@ public class TransferService {
 
     private NotificationResponseDTO createResponse(Long billId, BigDecimal amount,
                                                    AccountResponseDTO accountResponseDTO, BigDecimal availableAmount,
-                                                   Boolean isDeposit) {
+                                                   Boolean isDeposit) throws TransferNotSucceedException {
         NotificationResponseDTO notificationResponseDTO = new NotificationResponseDTO(billId, amount,
                 accountResponseDTO.getEmail(), availableAmount);
 
@@ -125,12 +127,13 @@ public class TransferService {
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            throw new TransferServiceException("Can't send message to RabbitMQ");
+            throw new TransferNotSucceedException("Can't send message to RabbitMQ");
         }
         return notificationResponseDTO;
     }
 
-    private BillRequestDTO createBillRequest(BigDecimal amount, BillResponseDTO billResponseDTO, Boolean isDeposit) {
+    private BillRequestDTO createBillRequest(BigDecimal amount, BillResponseDTO billResponseDTO, Boolean isDeposit)
+            throws TransferNotSucceedException {
         BillRequestDTO billRequestDTO = new BillRequestDTO();
         billRequestDTO.setAccountId(billResponseDTO.getAccountId());
         billRequestDTO.setCreationDate(billResponseDTO.getCreationDate());
@@ -143,19 +146,20 @@ public class TransferService {
                     billResponseDTO.getOverdraftEnabled()) {
                 billRequestDTO.setAmount(billResponseDTO.getAmount().subtract(amount));
             } else {
-                throw new TransferServiceException("Insufficient funds, available now: " + billResponseDTO.getAmount());
+                throw new TransferNotSucceedException("Insufficient funds, available now: " +
+                        billResponseDTO.getAmount());
             }
         }
         return billRequestDTO;
     }
 
 
-    private BillResponseDTO getDefaultBill(Long accountId) {
+    private BillResponseDTO getDefaultBill(Long accountId) throws TransferNotSucceedException {
         return billServiceClient.getBillsByAccountId(accountId).stream()
                 .filter(BillResponseDTO::getIsDefault)
                 .findAny()
-                .orElseThrow(() -> new TransferServiceException("Unable to find default bill for account: " +
-                        accountId + ". Please, that accountId is correct and call to you bank manager."));
+                .orElseThrow(() -> new TransferNotSucceedException("Unable to find default bill for account: " +
+                        accountId + ". Please, check that accountId is correct."));
     }
 
     public void resetActionFlag() {
@@ -165,7 +169,7 @@ public class TransferService {
 
     public Transfer getTransferById(Long transferId) {
         return transferRepository.findById(transferId).orElseThrow(() ->
-                new TransferServiceException("Unable to find transfer with id: " + transferId));
+                new NoRollbackException("Unable to find transfer with id: " + transferId));
     }
 
     public List<Transfer> getTransfersBySenderBillId(Long senderBillId) {

@@ -37,10 +37,7 @@ public class PaymentMessageHandler {
         mailMessage.setText("Make payment, sum:" + paymentResponseDTO.getAmount() + ", available now: " +
                 paymentResponseDTO.getAvailableAmount());
 
-        try {
-            javaMailSender.send(mailMessage);
-        } catch (Exception exception) {
-            System.out.println(exception);
-        }
+        javaMailSender.send(mailMessage);
+
     }
 }

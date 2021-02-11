@@ -32,10 +32,16 @@ public class TransferServiceExceptionHandler extends ResponseEntityExceptionHand
                 errors), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({TransferServiceException.class})
-    public ResponseEntity<HandlerTransferException> handleBillNotFoundException(TransferServiceException ex) {
-        return new ResponseEntity<>(new HandlerTransferException(ex.getMessage(), OffsetDateTime.now()),
-                HttpStatus.NOT_FOUND);
+    @ExceptionHandler({RollbackException.class})
+    public ResponseEntity<HandlerTransferException> handleRollbackException(RollbackException ex) {
+        return new ResponseEntity<>(new HandlerTransferException(ex.getMessage(), OffsetDateTime.now(),
+                ex.getClass().getSimpleName()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({NoRollbackException.class})
+    public ResponseEntity<HandlerTransferException> handleNoRollbackException(NoRollbackException ex) {
+        return new ResponseEntity<>(new HandlerTransferException(ex.getMessage(), OffsetDateTime.now(),
+                ex.getClass().getSimpleName()), HttpStatus.NOT_FOUND);
     }
 
 }

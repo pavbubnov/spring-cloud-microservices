@@ -13,4 +13,6 @@ public class HandlerTransferException {
 
     private OffsetDateTime time;
 
+    private String exception;
+
 }

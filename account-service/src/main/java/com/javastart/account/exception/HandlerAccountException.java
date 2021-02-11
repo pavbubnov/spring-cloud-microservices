@@ -14,4 +14,6 @@ public class HandlerAccountException {
 
     private OffsetDateTime time;
 
+    private String exception;
+
 }

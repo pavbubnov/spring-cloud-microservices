@@ -33,7 +33,7 @@ public class DepositServiceExceptionHandler extends ResponseEntityExceptionHandl
     }
 
     @ExceptionHandler({DepositServiceException.class})
-    public ResponseEntity<HandlerDepositException> handleBillNotFoundException(DepositServiceException ex) {
+    public ResponseEntity<HandlerDepositException> handleDepositServiceException(DepositServiceException ex) {
         return new ResponseEntity<>(new HandlerDepositException(ex.getMessage(), OffsetDateTime.now()),
                 HttpStatus.NOT_FOUND);
     }

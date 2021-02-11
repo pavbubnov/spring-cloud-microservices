@@ -37,10 +37,7 @@ public class DepositMessageHandler {
         mailMessage.setText("Make deposit, sum:" + depositResponseDTO.getAmount() + ", available now: " +
                 depositResponseDTO.getAvailableAmount());
 
-        try {
             javaMailSender.send(mailMessage);
-        } catch (Exception exception) {
-            System.out.println(exception);
-        }
+
     }
 }
