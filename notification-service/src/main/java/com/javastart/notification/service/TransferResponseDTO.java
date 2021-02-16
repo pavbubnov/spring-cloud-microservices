@@ -1,7 +1,6 @@
-package com.javastart.transfer.controller.dto;
+package com.javastart.notification.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,8 +8,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-@AllArgsConstructor
-public class NotificationResponseDTO {
+public class TransferResponseDTO {
 
     @JsonProperty("sender_bill_id")
     private Long senderBillId;

@@ -28,7 +28,7 @@ public class Account {
 
     private OffsetDateTime creationDate;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<Long> bills;
 
     public Account(String name, String email, String phone,
@@ -39,4 +39,5 @@ public class Account {
         this.creationDate = creationDate;
         this.bills = bills;
     }
+
 }

@@ -18,6 +18,10 @@ public class RabbitMQConfig {
     private static final String TOPIC_EXCHANGE_PAYMENT = "js.payment.notify.exchange";
     private static final String ROUTING_KEY_PAYMENT = "js.key.payment";
 
+    public static final String QUEUE_TRANSFER = "js.transfer.notify";
+    private static final String TOPIC_EXCHANGE_TRANSFER = "js.transfer.notify.exchange";
+    private static final String ROUTING_KEY_TRANSFER = "js.key.transfer";
+
     @Autowired
     private AmqpAdmin amqpAdmin;
 
@@ -55,6 +59,24 @@ public class RabbitMQConfig {
                 .bind(queuePayment())
                 .to(paymentExchange())
                 .with(ROUTING_KEY_PAYMENT);
+    }
+
+    @Bean
+    public TopicExchange transferExchange() {
+        return new TopicExchange(TOPIC_EXCHANGE_TRANSFER);
+    }
+
+    @Bean
+    public Queue queueTransfer() {
+        return new Queue(QUEUE_TRANSFER);
+    }
+
+    @Bean
+    public Binding transferBinding() {
+        return BindingBuilder
+                .bind(queueTransfer())
+                .to(transferExchange())
+                .with(ROUTING_KEY_TRANSFER);
     }
 
 }

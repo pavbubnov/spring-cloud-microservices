@@ -2,6 +2,7 @@ package com.javastart.bill.controller;
 
 import com.javastart.bill.controller.dto.BillRequestDTO;
 import com.javastart.bill.controller.dto.BillResponseDTO;
+import com.javastart.bill.entity.Bill;
 import com.javastart.bill.service.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +42,7 @@ public class BillController {
     }
 
     @DeleteMapping("/{billId}")
-    public String deleteBill(@PathVariable Long billId) {
+    public Bill deleteBill(@PathVariable Long billId) {
         return billService.deleteBill(billId);
     }
 

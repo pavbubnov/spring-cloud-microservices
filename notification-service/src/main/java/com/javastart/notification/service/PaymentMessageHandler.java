@@ -22,19 +22,20 @@ public class PaymentMessageHandler {
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_PAYMENT)
     public void receive(Message message) throws JsonProcessingException {
-        System.out.println(message);
+
         byte[] body = message.getBody();
         String jsonBody = new String(body);
         ObjectMapper objectMapper = new ObjectMapper();
         PaymentResponseDTO paymentResponseDTO = objectMapper.readValue(jsonBody, PaymentResponseDTO.class);
-        System.out.println(paymentResponseDTO);
+
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(paymentResponseDTO.getEmail());
         mailMessage.setFrom("pavbubnovJava@yandex.ru");
 
         mailMessage.setSubject("Payment");
-        mailMessage.setText("Make payment, sum:" + paymentResponseDTO.getAmount() + ", available now: " +
+        mailMessage.setText("Payment from your bill " + paymentResponseDTO.getBillId() +
+                ", sum:" + paymentResponseDTO.getAmount() + ", available now: " +
                 paymentResponseDTO.getAvailableAmount());
 
         javaMailSender.send(mailMessage);

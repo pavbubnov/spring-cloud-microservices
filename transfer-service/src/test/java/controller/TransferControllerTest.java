@@ -58,13 +58,13 @@ public class TransferControllerTest {
     }
 
     private static final String REQUEST = "{\n" +
-            "    \"senderBillId\": 3,\n" +
-            "    \"recipientBillId\": 4,\n" +
+            "    \"sender_bill_id\": 3,\n" +
+            "    \"recipient_bill_id\": 4,\n" +
             "    \"amount\": 3000.00\n" +
             "}";
 
     @Test
-    public void createDeposit() throws Exception {
+    public void createTransfer() throws Exception {
 
 
         Mockito.when(billServiceClient.getBillById(3l)).thenReturn(

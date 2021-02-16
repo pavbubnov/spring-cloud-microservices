@@ -2,10 +2,10 @@ package com.javastart.account.controller;
 
 import com.javastart.account.controller.dto.AccountRequestDTO;
 import com.javastart.account.controller.dto.AccountResponseDTO;
+import com.javastart.account.entity.Account;
 import com.javastart.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,7 +16,6 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
-    MethodArgumentNotValidException exception;
 
     @Autowired
     public AccountController(AccountService accountService) {
@@ -48,7 +47,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{accountId}")
-    public String deleteAccount(@PathVariable Long accountId) {
-        return new String(accountService.deleteAccount(accountId));
+    public AccountResponseDTO deleteAccount(@PathVariable Long accountId) {
+        return accountService.deleteAccount(accountId);
     }
 }

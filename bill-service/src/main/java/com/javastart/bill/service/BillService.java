@@ -38,7 +38,8 @@ public class BillService {
         AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(accountId);
 
         if (!accountResponseDTO.getBills().contains(billId)) {
-            throw new BillNotFoundException("Account with id: " + accountId + " doesn't contain bill with id: " + billId);
+            throw new BillNotFoundException("Account with id: " + accountId + " doesn't contain bill with id: "
+                    + billId);
         }
 
         List<Bill> billsList = getBillsByAccountId(accountId);
@@ -68,8 +69,8 @@ public class BillService {
         List<Bill> billsList = getBillsByAccountId(accountId);
 
         if (!getExistenceBillIdList(accountId).contains(billId)) {
-            throw new BillNotFoundException("Bill with id: " + billId + " is not belongs to account with id: " + accountId +
-                    " or has't created yet");
+            throw new BillNotFoundException("Bill with id: " + billId + " is not belongs to account with id: "
+                    + accountId + " or has't created yet");
         }
 
         if (isDefault) {
@@ -84,10 +85,10 @@ public class BillService {
         return billRepository.save(bill);
     }
 
-    public String deleteBill(Long billId) {
+    public Bill deleteBill(Long billId) {
         Bill deleteBill = getBillById(billId);
         billRepository.deleteById(billId);
-        return "Bill with id: " + billId + " was deleted";
+        return deleteBill;
     }
 
     public List<Bill> getBillsByAccountId(Long accountId) {

@@ -32,14 +32,14 @@ public class TransferServiceExceptionHandler extends ResponseEntityExceptionHand
                 errors), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({RollbackException.class})
-    public ResponseEntity<HandlerTransferException> handleRollbackException(RollbackException ex) {
+    @ExceptionHandler({RabbitMQException.class})
+    public ResponseEntity<HandlerTransferException> handleRollbackException(RabbitMQException ex) {
         return new ResponseEntity<>(new HandlerTransferException(ex.getMessage(), OffsetDateTime.now(),
                 ex.getClass().getSimpleName()), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({NoRollbackException.class})
-    public ResponseEntity<HandlerTransferException> handleNoRollbackException(NoRollbackException ex) {
+    @ExceptionHandler({TransferException.class})
+    public ResponseEntity<HandlerTransferException> handleNoRollbackException(TransferException ex) {
         return new ResponseEntity<>(new HandlerTransferException(ex.getMessage(), OffsetDateTime.now(),
                 ex.getClass().getSimpleName()), HttpStatus.NOT_FOUND);
     }

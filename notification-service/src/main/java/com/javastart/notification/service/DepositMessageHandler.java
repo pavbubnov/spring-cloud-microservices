@@ -22,19 +22,19 @@ public class DepositMessageHandler {
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_DEPOSIT)
     public void receive(Message message) throws JsonProcessingException {
-        System.out.println(message);
+
         byte[] body = message.getBody();
         String jsonBody = new String(body);
         ObjectMapper objectMapper = new ObjectMapper();
         DepositResponseDTO depositResponseDTO = objectMapper.readValue(jsonBody, DepositResponseDTO.class);
-        System.out.println(depositResponseDTO);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(depositResponseDTO.getEmail());
         mailMessage.setFrom("pavbubnovJava@yandex.ru");
 
         mailMessage.setSubject("Deposit");
-        mailMessage.setText("Make deposit, sum:" + depositResponseDTO.getAmount() + ", available now: " +
+        mailMessage.setText("Deposit to your bill: " + depositResponseDTO.getBillId() +", sum:" +
+                depositResponseDTO.getAmount() + ", available now: " +
                 depositResponseDTO.getAvailableAmount());
 
             javaMailSender.send(mailMessage);

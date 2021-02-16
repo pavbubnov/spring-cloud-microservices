@@ -21,14 +21,14 @@ public class AccountResponseDTO {
     @JsonProperty("email")
     private String email;
 
-    @JsonProperty("bills")
-    private List<Long> bills;
-
     @JsonProperty("phone")
     private String phone;
 
     @JsonProperty("creation_date")
     private OffsetDateTime creationDate;
+
+    @JsonProperty("bills")
+    private List<Long> bills;
 
     public AccountResponseDTO(Account account) {
         accountId = account.getAccountId();

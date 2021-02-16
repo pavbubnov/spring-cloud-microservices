@@ -1,11 +1,13 @@
 package com.javastart.account.service;
 
+import com.javastart.account.controller.dto.AccountResponseDTO;
 import com.javastart.account.entity.Account;
 import com.javastart.account.exception.AccountNotFoundException;
 import com.javastart.account.exception.CreateBillExceptiton;
 import com.javastart.account.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -53,10 +55,10 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
-    public String deleteAccount(Long accountId) {
+    public Account deleteAccount(Long accountId) {
         Account deletedAccount = getAccountById(accountId);
         accountRepository.deleteById(accountId);
-        return "Account with id: " + accountId + " was deleted";
+        return deletedAccount;
     }
 
     public Account addAccountBills(Long accountId, List<Long> additionalBills) {
