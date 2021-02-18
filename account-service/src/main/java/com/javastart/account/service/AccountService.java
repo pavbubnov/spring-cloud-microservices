@@ -1,6 +1,7 @@
 package com.javastart.account.service;
 
 import com.javastart.account.controller.dto.AccountResponseDTO;
+import com.javastart.account.controller.dto.AddBillsRequestDTO;
 import com.javastart.account.entity.Account;
 import com.javastart.account.exception.AccountNotFoundException;
 import com.javastart.account.exception.CreateBillExceptiton;
@@ -18,8 +19,6 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
 
-    private ArrayList<Long> numberOfBills = new ArrayList<>();
-
     @Autowired
     public AccountService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
@@ -34,15 +33,14 @@ public class AccountService {
 
         Account account = new Account(name, email, phone, OffsetDateTime.now(), bills);
         checkBillsId(bills);
-        addToGeneralBillList(bills);
-
         return accountRepository.save(account).getAccountId();
     }
 
     public Account updateAccount(Long accountId, String name,
                                  String email, String phone, List<Long> bills) {
 
-        addToGeneralBillList(createUniqueList(getAccountById(accountId).getBills(), bills, new ArrayList<>()));
+        checkEqualsList(bills);
+        createUniqueList(getAccountById(accountId).getBills(), bills, new ArrayList<>());
 
         Account account = new Account();
         account.setAccountId(accountId);
@@ -61,8 +59,9 @@ public class AccountService {
         return deletedAccount;
     }
 
-    public Account addAccountBills(Long accountId, List<Long> additionalBills) {
+    public Account addAccountBills(Long accountId, AddBillsRequestDTO addBillsRequestDTO) {
 
+        List<Long> additionalBills = addBillsRequestDTO.getBills();
         Account account = getAccountById(accountId);
         checkBillsId(additionalBills);
 
@@ -76,36 +75,24 @@ public class AccountService {
 
         ArrayList<Long> numberOfRepeatingBills = new ArrayList<>();
         boolean flagOfRepeatingBills = false;
-        boolean flagOfEqualsBills = false;
 
-        for (int k = 0; k < bills.size(); k++) {
-            for (int z = k + 1; z < bills.size(); z++) {
-                if (bills.get(k) == bills.get(z)) {
-                    throw new CreateBillExceptiton("You have equals bills, please, check");
-                }
-            }
-        }
 
-        for (int i = 0; i < numberOfBills.size(); i++) {
-            for (int j = 0; j < bills.size(); j++) {
-                if (bills.get(j) == numberOfBills.get(i)) {
-                    flagOfRepeatingBills = true;
-                    numberOfRepeatingBills.add(bills.get(j));
-                }
+        checkEqualsList(bills);
+
+        for (int j = 0; j < bills.size(); j++) {
+            Account accountByBills = accountRepository.findAccountByBills(bills.get(j));
+            if (accountByBills != null) {
+                flagOfRepeatingBills = true;
+                numberOfRepeatingBills.add(bills.get(j));
             }
         }
         if (flagOfRepeatingBills) {
             throw new CreateBillExceptiton("There is(are) bills with id :" + numberOfRepeatingBills);
         }
+
     }
 
-    private void addToGeneralBillList(List<Long> bills) {
-        for (int i = 0; i < bills.size(); i++) {
-            numberOfBills.add(bills.get(i));
-        }
-    }
-
-    private ArrayList<Long> createUniqueList(List<Long> oldList, List<Long> bills, ArrayList<Long> uniqueList) {
+    private void createUniqueList(List<Long> oldList, List<Long> bills, ArrayList<Long> uniqueList) {
 
         for (int i = 0; i < bills.size(); i++) {
             boolean uniqueFlag = true;
@@ -122,9 +109,20 @@ public class AccountService {
         if (uniqueList != null) {
             checkBillsId(uniqueList);
         }
+    }
 
-        return uniqueList;
+    public Account findAccountByBillId(Long billId) {
+        return accountRepository.findAccountByBills(billId);
+    }
 
+    private void checkEqualsList(List<Long> bills) {
+        for (int k = 0; k < bills.size(); k++) {
+            for (int z = k + 1; z < bills.size(); z++) {
+                if (bills.get(k) == bills.get(z)) {
+                    throw new CreateBillExceptiton("You have equals bills, please, check");
+                }
+            }
+        }
     }
 
 }

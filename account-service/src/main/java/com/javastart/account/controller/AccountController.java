@@ -2,6 +2,7 @@ package com.javastart.account.controller;
 
 import com.javastart.account.controller.dto.AccountRequestDTO;
 import com.javastart.account.controller.dto.AccountResponseDTO;
+import com.javastart.account.controller.dto.AddBillsRequestDTO;
 import com.javastart.account.entity.Account;
 import com.javastart.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +43,17 @@ public class AccountController {
 
     @PatchMapping("/{accountId}")
     public AccountResponseDTO addAccountBills(@PathVariable Long accountId,
-                                              @RequestBody List<Long> additionalBill) {
+                                              @Valid @RequestBody AddBillsRequestDTO additionalBill) {
         return new AccountResponseDTO(accountService.addAccountBills(accountId, additionalBill));
     }
 
     @DeleteMapping("/{accountId}")
-    public AccountResponseDTO deleteAccount(@PathVariable Long accountId) {
+    public Account deleteAccount(@PathVariable Long accountId) {
         return accountService.deleteAccount(accountId);
+    }
+
+    @GetMapping("/accountByBillId/{billId}")
+    public Account findAccountByBillId(@PathVariable Long billId) {
+        return accountService.findAccountByBillId(billId);
     }
 }
