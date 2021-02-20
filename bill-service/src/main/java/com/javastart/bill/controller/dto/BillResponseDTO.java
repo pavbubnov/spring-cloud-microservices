@@ -3,13 +3,17 @@ package com.javastart.bill.controller.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.javastart.bill.entity.Bill;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
+@Data
 public class BillResponseDTO {
 
     @JsonProperty("bill_id")

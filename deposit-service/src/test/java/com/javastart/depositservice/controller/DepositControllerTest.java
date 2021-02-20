@@ -62,7 +62,7 @@ public class DepositControllerTest {
     }
 
     private static final String REQUEST = "{\n" +
-            "    \"billId\": 1,\n" +
+            "    \"bill_id\": 1,\n" +
             "    \"amount\": 3000\n" +
             "}";
 

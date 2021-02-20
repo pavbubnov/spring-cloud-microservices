@@ -52,8 +52,5 @@ public class AccountController {
         return accountService.deleteAccount(accountId);
     }
 
-    @GetMapping("/accountByBillId/{billId}")
-    public Account findAccountByBillId(@PathVariable Long billId) {
-        return accountService.findAccountByBillId(billId);
-    }
+
 }
