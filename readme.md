@@ -71,7 +71,7 @@ with information about succeed transactional is used RabbitMQ `message broker` w
 *It is possible to tune application quick start with Docker container if user have enough RAM*
 
 ### Necessary steps with JSON examples:
-######1. Create account :
+###### 1. Create account :
 
 
     {
@@ -83,7 +83,7 @@ with information about succeed transactional is used RabbitMQ `message broker` w
     It will return account id: -> 1
     
     
-######2. Create a bill : 
+###### 2. Create a bill : 
 *Additional information: you can create the bill only with id that contain account bills list.*
 *If you create first bill for account - this bill will be default anyway. If you create default bill but account has already existed default bill, existing default bill will change to not default.*  *
 
@@ -96,7 +96,7 @@ with information about succeed transactional is used RabbitMQ `message broker` w
         "is_overdraft_enabled" : false 
     }
 
-######After first and second steps you can make deposits, payments or transfers(if you have at least two bills):
+###### After first and second steps you can make deposits, payments or transfers(if you have at least two bills):
 
     Deposit or payment:
     {
