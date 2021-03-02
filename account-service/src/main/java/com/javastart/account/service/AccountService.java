@@ -7,6 +7,7 @@ import com.javastart.account.exception.CreateBillException;
 import com.javastart.account.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -103,6 +104,7 @@ public class AccountService {
      */
     public Account deleteAccount(Long accountId) {
         Account deletedAccount = getAccountById(accountId);
+        deletedAccount.toString();
         accountRepository.deleteById(accountId);
         return deletedAccount;
     }

@@ -1,22 +1,19 @@
-package com.javastart.account.exception;
+package com.javastart.deposit.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-@Getter
-public class ValidateException {
+public class DepositTemplateList {
 
     private List<String> field;
 
     private OffsetDateTime time;
 
     private List<String> message;
-
 
 }

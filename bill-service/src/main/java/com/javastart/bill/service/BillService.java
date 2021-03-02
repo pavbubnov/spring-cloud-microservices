@@ -1,7 +1,7 @@
 package com.javastart.bill.service;
 
 import com.javastart.bill.entity.Bill;
-import com.javastart.bill.exception.BillNotFoundException;
+import com.javastart.bill.exception.BillCreateException;
 import com.javastart.bill.repository.BillRepository;
 import com.javastart.bill.rest.AccountResponseDTO;
 import com.javastart.bill.rest.AccountServiceClient;
@@ -29,7 +29,7 @@ public class BillService {
 
     public Bill getBillById(Long billId) {
         return billRepository.findById(billId)
-                .orElseThrow(() -> new BillNotFoundException("Unable to find bill with id: " + billId));
+                .orElseThrow(() -> new BillCreateException("Unable to find bill with id: " + billId));
     }
 
     public Long createBill(Long accountId, Long billId, BigDecimal amount, Boolean isDefault, Boolean overdraftEnabled)
@@ -38,14 +38,14 @@ public class BillService {
         AccountResponseDTO accountResponseDTO = accountServiceClient.getAccountById(accountId);
 
         if (!accountResponseDTO.getBills().contains(billId)) {
-            throw new BillNotFoundException("Account with id: " + accountId + " doesn't contain bill with id: "
+            throw new BillCreateException("Account with id: " + accountId + " doesn't contain bill with id: "
                     + billId);
         }
 
         List<Bill> billsList = getBillsByAccountId(accountId);
 
         if (getExistenceBillIdList(accountId).contains(billId)) {
-            throw new BillNotFoundException("Bill with id: " + billId + " is already exists");
+            throw new BillCreateException("Bill with id: " + billId + " is already exists");
         }
 
         if (billsList.size() == 0) {
@@ -63,13 +63,13 @@ public class BillService {
                            Boolean isDefault, Boolean overdraftEnabled) {
 
         if (billId == null) {
-            throw new BillNotFoundException("Enter bill id");
+            throw new BillCreateException("Enter bill id");
         }
 
         List<Bill> billsList = getBillsByAccountId(accountId);
 
         if (!getExistenceBillIdList(accountId).contains(billId)) {
-            throw new BillNotFoundException("Bill with id: " + billId + " is not belongs to account with id: "
+            throw new BillCreateException("Bill with id: " + billId + " is not belongs to account with id: "
                     + accountId + " or has't created yet");
         }
 

@@ -1,7 +1,7 @@
 package com.javastart.billtest;
 
 import com.javastart.bill.entity.Bill;
-import com.javastart.bill.exception.BillNotFoundException;
+import com.javastart.bill.exception.BillCreateException;
 import com.javastart.bill.repository.BillRepository;
 import com.javastart.bill.rest.AccountServiceClient;
 import com.javastart.bill.service.BillService;
@@ -40,7 +40,7 @@ public class BillServiceTest {
 
         returnAccountResponseDTO(1l);
 
-        Throwable throwable = assertThrows(BillNotFoundException.class, () -> {
+        Throwable throwable = assertThrows(BillCreateException.class, () -> {
             billService.createBill(1l, 1l, BigDecimal.valueOf(5000),
                     true, true);
         });
@@ -53,13 +53,13 @@ public class BillServiceTest {
         Mockito.when(billRepository.getBillsByAccountId(1l)).
                 thenReturn(Arrays.asList(billReturn));
 
-        Throwable throwable2 = assertThrows(BillNotFoundException.class, () -> {
+        Throwable throwable2 = assertThrows(BillCreateException.class, () -> {
             billService.createBill(1l, 3l, BigDecimal.valueOf(5000),
                     true, true);
         });
         assertTrue(throwable2.getMessage().equals("Bill with id: " + 3l + " is already exists"));
 
-        Throwable throwable3 = assertThrows(BillNotFoundException.class, () -> {
+        Throwable throwable3 = assertThrows(BillCreateException.class, () -> {
             billService.getBillById(4l);
         });
         assertTrue(throwable3.getMessage().equals("Unable to find bill with id: " + 4l));
@@ -68,13 +68,13 @@ public class BillServiceTest {
 
         Assertions.assertThat(billService.getBillsByAccountId(1l).get(0).getBillId()).isEqualTo(3);
 
-        Throwable throwable4 = assertThrows(BillNotFoundException.class, () -> {
+        Throwable throwable4 = assertThrows(BillCreateException.class, () -> {
             billService.updateBill(4l, 1l, BigDecimal.valueOf(5000), true, true);
         });
         assertTrue(throwable4.getMessage().equals("Bill with id: " + 4l + " is not belongs to account with id: " + 1l +
                 " or has't created yet"));
 
-        Throwable throwable5 = assertThrows(BillNotFoundException.class, () -> {
+        Throwable throwable5 = assertThrows(BillCreateException.class, () -> {
             billService.updateBill(4l, 2l, BigDecimal.valueOf(5000), true, true);
         });
         assertTrue(throwable5.getMessage().equals("Bill with id: " + 4l + " is not belongs to account with id: " + 2l +

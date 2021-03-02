@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,14 +31,22 @@ public class PaymantServiceExceptionHandler extends ResponseEntityExceptionHandl
                 ((FieldError) objectError).getField()).collect(Collectors.toList());
 
 
-        return new ResponseEntity<>(new ValidateException(fields, OffsetDateTime.now(),
+        return new ResponseEntity<>(new PaymentTemplateList(fields, OffsetDateTime.now(),
                 errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({PaymentServiceException.class})
-    public ResponseEntity<HandlerPaymentException> paymentServiceException(PaymentServiceException ex) {
-        return new ResponseEntity<>(new HandlerPaymentException(ex.getMessage(), OffsetDateTime.now()),
+    public ResponseEntity<PaymentTemplate> paymentServiceException(PaymentServiceException ex) {
+        return new ResponseEntity<>(new PaymentTemplate(ex.getMessage(), OffsetDateTime.now(),
+                ex.getClass().getSimpleName()),
                 HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    protected ResponseEntity<PaymentTemplate> handleConstraintViolationException(ConstraintViolationException ex) {
+        return new ResponseEntity<>(new PaymentTemplate(ex.getMessage()
+                .substring(ex.getMessage().indexOf(" ") + 1), OffsetDateTime.now(),
+                ex.getClass().getSimpleName()), HttpStatus.BAD_REQUEST);
     }
 
 }

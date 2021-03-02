@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
@@ -28,17 +29,20 @@ public class TransferController {
     }
 
     @GetMapping("/transfers/{transferId}")
-    public Transfer getTransferById(@PathVariable Long transferId) {
+    public Transfer getTransferById(@PathVariable @Positive(message = "Please, enter correct Id (Path)")
+                                            Long transferId) {
         return transfeService.getTransferById(transferId);
     }
 
     @GetMapping("/transfers/sender/{senderBillId}")
-    public List<Transfer> getTransfersBySenderBillId(@PathVariable Long senderBillId) {
+    public List<Transfer> getTransfersBySenderBillId(@PathVariable @Positive
+            (message = "Please, enter correct Id (Path)") Long senderBillId) {
         return transfeService.getTransfersBySenderBillId(senderBillId);
     }
 
     @GetMapping("/transfers/recipient/{recipientBillId}")
-    public List<Transfer> getTransfersByRecipientBillId(@PathVariable Long recipientBillId) {
+    public List<Transfer> getTransfersByRecipientBillId(@PathVariable @Positive
+            (message = "Please, enter correct Id (Path)") Long recipientBillId) {
         return transfeService.getTransfersByRecipientBillId(recipientBillId);
     }
 }

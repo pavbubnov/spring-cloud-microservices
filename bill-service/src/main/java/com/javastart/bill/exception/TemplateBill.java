@@ -1,4 +1,4 @@
-package com.javastart.transfer.exception;
+package com.javastart.bill.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
-public class HandlerTransferException {
+public class TemplateBill {
 
     private String message;
 

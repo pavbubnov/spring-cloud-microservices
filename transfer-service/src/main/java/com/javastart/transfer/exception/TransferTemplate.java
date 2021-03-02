@@ -1,6 +1,5 @@
-package com.javastart.account.exception;
+package com.javastart.transfer.exception;
 
-import com.sun.scenario.effect.Offset;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,7 +7,7 @@ import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
-public class HandlerAccountException {
+public class TransferTemplate {
 
     private String message;
 

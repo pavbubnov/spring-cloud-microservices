@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,20 +29,27 @@ public class TransferServiceExceptionHandler extends ResponseEntityExceptionHand
                 ((FieldError) objectError).getDefaultMessage()).collect(Collectors.toList());
         List<String> fields = result.getFieldErrors().stream().map(objectError ->
                 ((FieldError) objectError).getField()).collect(Collectors.toList());
-        return new ResponseEntity<>(new ValidateException(fields, OffsetDateTime.now(),
+        return new ResponseEntity<>(new TransferTemplateList(fields, OffsetDateTime.now(),
                 errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({RabbitMQException.class})
-    public ResponseEntity<HandlerTransferException> handleRollbackException(RabbitMQException ex) {
-        return new ResponseEntity<>(new HandlerTransferException(ex.getMessage(), OffsetDateTime.now(),
+    public ResponseEntity<TransferTemplate> handleRollbackException(RabbitMQException ex) {
+        return new ResponseEntity<>(new TransferTemplate(ex.getMessage(), OffsetDateTime.now(),
                 ex.getClass().getSimpleName()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({TransferException.class})
-    public ResponseEntity<HandlerTransferException> handleNoRollbackException(TransferException ex) {
-        return new ResponseEntity<>(new HandlerTransferException(ex.getMessage(), OffsetDateTime.now(),
+    public ResponseEntity<TransferTemplate> handleNoRollbackException(TransferException ex) {
+        return new ResponseEntity<>(new TransferTemplate(ex.getMessage(), OffsetDateTime.now(),
                 ex.getClass().getSimpleName()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    protected ResponseEntity<TransferTemplate> handleConstraintViolationException(ConstraintViolationException ex) {
+        return new ResponseEntity<>(new TransferTemplate(ex.getMessage()
+                .substring(ex.getMessage().indexOf(" ") + 1), OffsetDateTime.now(),
+                ex.getClass().getSimpleName()), HttpStatus.BAD_REQUEST);
     }
 
 }

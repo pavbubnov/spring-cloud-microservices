@@ -1,4 +1,4 @@
-package com.javastart.deposit.exception;
+package com.javastart.transfer.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ValidateException {
+public class TransferTemplateList {
 
     private List<String> field;
 

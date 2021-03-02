@@ -1,4 +1,4 @@
-package com.javastart.bill.exception;
+package com.javastart.deposit.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,12 @@ import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
-public class HandlerBillException {
+public class DepositTemplate {
 
     private String message;
 
     private OffsetDateTime time;
+
+    private String exception;
 
 }

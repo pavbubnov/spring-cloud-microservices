@@ -1,4 +1,4 @@
-package com.javastart.transfer.exception;
+package com.javastart.bill.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ValidateException {
+public class TemplateBillList {
 
     private List<String> field;
 

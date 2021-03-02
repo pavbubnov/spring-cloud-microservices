@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,12 +29,14 @@ public class DepositController {
     }
 
     @GetMapping("/deposits/{depositId}")
-    public DepositResponseDTO getDeposit(@PathVariable Long depositId) {
+    public DepositResponseDTO getDeposit(@PathVariable @Positive(message = "Please, enter correct Id (Path)")
+                                                 Long depositId) {
         return new DepositResponseDTO(depositService.getDepositById(depositId));
     }
 
     @GetMapping("deposits/bill/{billId}")
-    public List<DepositResponseDTO> getDepositsByBillId(@PathVariable Long billId) {
+    public List<DepositResponseDTO> getDepositsByBillId(@PathVariable @Positive(message
+            = "Please, enter correct Id (Path)") Long billId) {
         return depositService.getDepositsByBillId(billId).stream().
                 map(DepositResponseDTO::new).
                 collect(Collectors.toList());

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @FeignClient(name = "bill-service")
@@ -14,11 +15,14 @@ import java.util.List;
 public interface BillServiceClient {
 
     @RequestMapping(value = "bills/{billId}", method = RequestMethod.GET)
-    BillResponseDTO getBillById(@PathVariable("billId") Long billId);
+    BillResponseDTO getBillById(@PathVariable("billId") @Positive(message = "Please, enter correct Id (Path)")
+                                        Long billId);
 
     @RequestMapping(value = "bills/{billId}", method = RequestMethod.PUT)
-    void update(@PathVariable("billId") Long billId, @Valid BillRequestDTO billRequestDTO);
+    void update(@PathVariable("billId") @Positive(message = "Please, enter correct Id (Path)")
+                        Long billId, @Valid BillRequestDTO billRequestDTO);
 
     @RequestMapping(value = "bills/account/{accountId}", method = RequestMethod.GET)
-    List<BillResponseDTO> getBillsByAccountId(@PathVariable("accountId") Long accountId);
+    List<BillResponseDTO> getBillsByAccountId(@PathVariable("accountId")
+                                              @Positive(message = "Please, enter correct Id (Path)") Long accountId);
 }

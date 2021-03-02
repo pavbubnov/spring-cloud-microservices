@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ValidateException {
+public class PaymentTemplateList {
 
     private List<String> field;
 

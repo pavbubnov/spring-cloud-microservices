@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
+import javax.validation.constraints.Positive;
 
 @RestController
 @Validated
@@ -24,7 +24,8 @@ public class AccountController {
     }
 
     @GetMapping("/{accountId}")
-    public AccountResponseDTO getAccount(@PathVariable Long accountId) {
+    public AccountResponseDTO getAccount(@PathVariable @Positive(message = "Please, enter correct Id (Path)")
+                                                 Long accountId) {
         return new AccountResponseDTO(accountService.getAccountById(accountId));
     }
 
@@ -35,20 +36,22 @@ public class AccountController {
     }
 
     @PutMapping("/{accountId}")
-    public AccountResponseDTO updateAccount(@PathVariable Long accountId, @Valid
-    @RequestBody AccountRequestDTO accountRequestDTO) {
+    public AccountResponseDTO updateAccount(@PathVariable @Positive(message = "Please, enter correct Id (Path)")
+                                                    Long accountId,
+                                            @Valid @RequestBody AccountRequestDTO accountRequestDTO) {
         return new AccountResponseDTO(accountService.updateAccount(accountId, accountRequestDTO.getName(),
                 accountRequestDTO.getEmail(), accountRequestDTO.getPhone(), accountRequestDTO.getBills()));
     }
 
     @PatchMapping("/{accountId}")
-    public AccountResponseDTO addAccountBills(@PathVariable Long accountId,
-                                              @Valid @RequestBody AddBillsRequestDTO additionalBill) {
+    public AccountResponseDTO addAccountBills(@PathVariable @Positive(message = "Please, enter correct Id (Path)")
+                                                      Long accountId, @Valid @RequestBody AddBillsRequestDTO
+                                                      additionalBill) {
         return new AccountResponseDTO(accountService.addAccountBills(accountId, additionalBill));
     }
 
     @DeleteMapping("/{accountId}")
-    public Account deleteAccount(@PathVariable Long accountId) {
+    public Account deleteAccount(@PathVariable @Positive(message = "Please, enter correct Id (Path)") Long accountId) {
         return accountService.deleteAccount(accountId);
     }
 

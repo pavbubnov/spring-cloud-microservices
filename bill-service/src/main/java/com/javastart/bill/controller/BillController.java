@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public class BillController {
     }
 
     @GetMapping("/{billId}")
-    public BillResponseDTO getBill(@PathVariable Long billId) {
+    public BillResponseDTO getBill(@PathVariable @Positive(message = "Please, enter correct Id (Path)") Long billId) {
         return new BillResponseDTO(billService.getBillById(billId));
     }
 
@@ -35,19 +36,20 @@ public class BillController {
     }
 
     @PutMapping("/{billId}")
-    public BillResponseDTO updateBill(@PathVariable Long billId, @Valid
-    @RequestBody BillRequestDTO billRequestDTO) {
+    public BillResponseDTO updateBill(@PathVariable @Positive(message = "Please, enter correct Id (Path)") Long billId,
+                                      @Valid @RequestBody BillRequestDTO billRequestDTO) {
         return new BillResponseDTO(billService.updateBill(billId, billRequestDTO.getAccountId(),
                 billRequestDTO.getAmount(), billRequestDTO.getIsDefault(), billRequestDTO.getOverdraftEnabled()));
     }
 
     @DeleteMapping("/{billId}")
-    public Bill deleteBill(@PathVariable Long billId) {
+    public Bill deleteBill(@PathVariable @Positive(message = "Please, enter correct Id (Path)") Long billId) {
         return billService.deleteBill(billId);
     }
 
     @GetMapping("/account/{accountId}")
-    public List<BillResponseDTO> getBillsByAccountId(@PathVariable Long accountId) {
+    public List<BillResponseDTO> getBillsByAccountId(@PathVariable @Positive
+            (message = "Please, enter correct Id (Path)") Long accountId) {
         return billService.getBillsByAccountId(accountId).stream()
                 .map(BillResponseDTO::new)
                 .collect(Collectors.toList());

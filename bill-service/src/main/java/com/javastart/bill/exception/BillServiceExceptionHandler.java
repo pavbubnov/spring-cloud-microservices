@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,14 +31,21 @@ public class BillServiceExceptionHandler extends ResponseEntityExceptionHandler 
         List<String> fields = result.getFieldErrors().stream().map(objectError ->
                 ((FieldError) objectError).getField()).collect(Collectors.toList());
 
-        return new ResponseEntity<>(new ValidateException(fields, OffsetDateTime.now(),
+        return new ResponseEntity<>(new TemplateBillList(fields, OffsetDateTime.now(),
                 errors), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({BillNotFoundException.class})
-    public ResponseEntity<HandlerBillException> handleBillNotFoundException(BillNotFoundException ex) {
-        return new ResponseEntity<>(new HandlerBillException(ex.getMessage(), OffsetDateTime.now()),
-                HttpStatus.NOT_FOUND);
+    @ExceptionHandler({ConstraintViolationException.class})
+    protected ResponseEntity<TemplateBill> handleConstraintViolationException(ConstraintViolationException ex) {
+        return new ResponseEntity<>(new TemplateBill(ex.getMessage()
+                .substring(ex.getMessage().indexOf(" ") + 1), OffsetDateTime.now(),
+                ex.getClass().getSimpleName()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({BillCreateException.class})
+    public ResponseEntity<TemplateBill> handleBillCreateException(BillCreateException ex) {
+        return new ResponseEntity<>(new TemplateBill(ex.getMessage(), OffsetDateTime.now(),
+                ex.getClass().getSimpleName()), HttpStatus.NOT_FOUND);
     }
 
 }
