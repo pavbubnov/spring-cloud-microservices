@@ -12,6 +12,7 @@ import com.javastart.transfer.exception.MessageNotSucceedException;
 import com.javastart.transfer.repository.TransferRepository;
 import com.javastart.transfer.rest.*;
 import feign.FeignException;
+import org.springframework.amqp.AmqpConnectException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,17 +53,33 @@ public class TransferService {
         Long recipientBillId = transferRequestDTO.getRecipientBillId();
         BigDecimal amount = transferRequestDTO.getAmount();
 
-        BigDecimal senderAvailableAmount;
-        BigDecimal recipientAvailableAmount;
+        checkAllNullException(senderAccountId, senderBillId, recipientAccountId, recipientBillId);
 
-        BillRequestDTO senderBillRequestDTO;
-        BillResponseDTO senderBillResponseDTO;
-        AccountResponseDTO senderAccountResponseDTO;
-        BillRequestDTO recipientBillRequestDTO;
-        BillResponseDTO recipientBillResponseDTO;
-        AccountResponseDTO recipientAccountResponseDTO;
+        BillResponseDTO senderBillResponseDTO = createBillResponse(senderBillId, senderAccountId);
+        BillRequestDTO senderBillRequestDTO = createBillRequest(amount, senderBillResponseDTO, false);
+        AccountResponseDTO senderAccountResponseDTO = createAccountResponse(senderBillResponseDTO.getAccountId());
+        senderBillId = senderBillResponseDTO.getBillId();
 
+        BillResponseDTO recipientBillResponseDTO = createBillResponse(recipientBillId, recipientAccountId);
+        BillRequestDTO recipientBillRequestDTO = createBillRequest(amount, recipientBillResponseDTO, true);
+        AccountResponseDTO recipientAccountResponseDTO = createAccountResponse(recipientBillResponseDTO.getAccountId());
+        recipientBillId = recipientBillResponseDTO.getBillId();
 
+        BigDecimal senderAvailableAmount = updateBill(senderBillId, senderBillRequestDTO);
+        BigDecimal recipientAvailableAmount = updateBill(recipientBillId, recipientBillRequestDTO);
+
+        Transfer transfer = new Transfer(senderBillId, recipientBillId,
+                amount, OffsetDateTime.now(), senderAccountResponseDTO.getEmail(),
+                recipientAccountResponseDTO.getEmail());
+
+        transferRepository.save(transfer);
+        sendNotification(transfer, senderAvailableAmount, recipientAvailableAmount);
+
+        return new TransferResponseDTO(transfer);
+    }
+
+    private void checkAllNullException(Long senderAccountId, Long senderBillId,
+                                       Long recipientAccountId, Long recipientBillId) {
         if (senderAccountId == null && senderBillId == null) {
             throw new TransferException("Sender id is null and recipientId is null");
         }
@@ -70,64 +87,6 @@ public class TransferService {
         if (recipientAccountId == null && recipientBillId == null) {
             throw new TransferException("Recipient id is null and recipientId is null");
         }
-
-        if (senderBillId != null) {
-            senderBillResponseDTO = createBillResponse(senderBillId);
-            senderBillRequestDTO = createBillRequest(amount, senderBillResponseDTO, false);
-            senderAccountResponseDTO = createAccountResponse(senderBillResponseDTO.getAccountId());
-        } else {
-            senderBillResponseDTO = getDefaultBill(senderAccountId);
-            senderBillRequestDTO = createBillRequest(amount, senderBillResponseDTO, false);
-            senderAccountResponseDTO = accountServiceClient.getAccountById(senderAccountId);
-            senderBillId = senderBillResponseDTO.getBillId();
-        }
-
-        if (recipientBillId != null) {
-            recipientBillResponseDTO = createBillResponse(recipientBillId);
-            recipientBillRequestDTO = createBillRequest(amount, recipientBillResponseDTO, true);
-            recipientAccountResponseDTO = createAccountResponse(recipientBillResponseDTO.getAccountId());
-        } else {
-            recipientBillResponseDTO = getDefaultBill(recipientAccountId);
-            recipientBillRequestDTO = createBillRequest(amount, recipientBillResponseDTO, true);
-            recipientAccountResponseDTO = accountServiceClient.getAccountById(recipientAccountId);
-            recipientBillId = recipientBillResponseDTO.getBillId();
-        }
-
-
-        billServiceClient.update(senderBillId, senderBillRequestDTO);
-        senderAvailableAmount = senderBillRequestDTO.getAmount();
-
-
-        billServiceClient.update(recipientBillId, recipientBillRequestDTO);
-        recipientAvailableAmount = recipientBillRequestDTO.getAmount();
-
-        NotificationResponseDTO senderNotificationResponseDTO = new NotificationResponseDTO(
-                senderBillId, recipientBillId, amount, senderAccountResponseDTO.getEmail(),
-                senderAvailableAmount, false);
-
-        NotificationResponseDTO recipientNotificationResponseDTO = new NotificationResponseDTO(
-                senderBillId, recipientBillId, amount, recipientAccountResponseDTO.getEmail(),
-                recipientAvailableAmount, true);
-
-        transferRepository.save(new Transfer(senderBillId, recipientBillId,
-                transferRequestDTO.getAmount(), OffsetDateTime.now(),
-                senderAccountResponseDTO.getEmail(), recipientAccountResponseDTO.getEmail()));
-
-        try {
-            createResponse(senderNotificationResponseDTO);
-        } catch (MessageNotSucceedException exception) {
-            throw new RabbitMQException(exception.getMessage());
-        }
-
-        try {
-            createResponse(recipientNotificationResponseDTO);
-        } catch (MessageNotSucceedException exception) {
-            throw new RabbitMQException(exception.getMessage());
-        }
-
-        return new TransferResponseDTO(senderBillId, recipientBillId,
-                amount, OffsetDateTime.now(), senderAccountResponseDTO.getEmail(),
-                recipientAccountResponseDTO.getEmail());
     }
 
 
@@ -139,16 +98,22 @@ public class TransferService {
         }
     }
 
-    private BillResponseDTO createBillResponse(Long billId) {
-        try {
-            return billServiceClient.getBillById(billId);
-        } catch (FeignException feignException) {
-            throw new TransferException("Unable to find bill with id: " + billId);
-        }
+    private BillResponseDTO createBillResponse(Long billId, Long accountId) {
+
+        if (billId != null) {
+            try {
+                return billServiceClient.getBillById(billId);
+            } catch (FeignException feignException) {
+                throw new TransferException("Unable to find bill with id: " + billId);
+            }
+        } else return getDefaultBill(accountId);
+
     }
 
 
     private BillRequestDTO createBillRequest(BigDecimal amount, BillResponseDTO billResponseDTO, Boolean isPlus) {
+
+
         BillRequestDTO billRequestDTO = new BillRequestDTO();
         billRequestDTO.setAccountId(billResponseDTO.getAccountId());
         billRequestDTO.setCreationDate(billResponseDTO.getCreationDate());
@@ -168,6 +133,7 @@ public class TransferService {
         return billRequestDTO;
     }
 
+
     private BillResponseDTO getDefaultBill(Long accountId) {
         return billServiceClient.getBillsByAccountId(accountId).stream()
                 .filter(BillResponseDTO::getIsDefault)
@@ -186,9 +152,42 @@ public class TransferService {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new MessageNotSucceedException("Can't send message to RabbitMQ");
+        } catch (AmqpConnectException e) {
+            e.printStackTrace();
+            throw new MessageNotSucceedException("Can't send message to RabbitMQ");
         }
     }
 
+    private BigDecimal updateBill(Long billId, BillRequestDTO billRequestDTO) {
+        billServiceClient.update(billId, billRequestDTO);
+        return billRequestDTO.getAmount();
+    }
+
+    private void sendNotification(Transfer transfer, BigDecimal senderAvailableAmount,
+                                  BigDecimal recipientAvailableAmount) {
+
+        NotificationResponseDTO senderNotificationResponseDTO = new NotificationResponseDTO(
+                transfer.getSenderBillId(), transfer.getRecipientBillId(), transfer.getAmount(),
+                transfer.getSenderEmail(), senderAvailableAmount, false);
+
+        NotificationResponseDTO recipientNotificationResponseDTO = new NotificationResponseDTO(
+                transfer.getSenderBillId(), transfer.getRecipientBillId(), transfer.getAmount(),
+                transfer.getRecipientEmail(), recipientAvailableAmount, true);
+
+        try {
+            createResponse(senderNotificationResponseDTO);
+        } catch (MessageNotSucceedException exception) {
+            throw new RabbitMQException(exception.getMessage() + " , transfer succeed :" +
+                    transfer.toString());
+        }
+
+        try {
+            createResponse(recipientNotificationResponseDTO);
+        } catch (MessageNotSucceedException exception) {
+            throw new RabbitMQException(exception.getMessage() + " , transfer succeed :" +
+                    transfer.toString());
+        }
+    }
 
     public Transfer getTransferById(Long transferId) {
         return transferRepository.findById(transferId).orElseThrow(() ->
