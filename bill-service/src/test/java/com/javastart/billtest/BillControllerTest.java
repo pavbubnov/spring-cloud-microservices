@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -68,6 +69,14 @@ public class BillControllerTest {
             "    \"bill_id\": 1,\n" +
             "    \"amount\": 3000,\n" +
             "    \"is_default\": true,\n" +
+            "    \"is_overdraft_enabled\": false\n" +
+            "}";
+
+    private static final String REQUEST_REDEFAULT_ERROR = "{\n" +
+            "    \"account_id\": 1,\n" +
+            "    \"bill_id\": 1,\n" +
+            "    \"amount\": 3000,\n" +
+            "    \"is_default\": false,\n" +
             "    \"is_overdraft_enabled\": false\n" +
             "}";
 
@@ -138,5 +147,13 @@ public class BillControllerTest {
         body = getRequestBillThree.getResponse().getContentAsString();
         billResponseDTO = objectMapper.readValue(body, BillResponseDTO.class);
         Assertions.assertThat(billResponseDTO.getIsDefault()).isEqualTo(false);
+
+        getRequestBillThree = mockMvc.perform(put("/1")
+                .content(REQUEST_REDEFAULT_ERROR).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)).andExpect(status()
+                .isNotFound()).andReturn();
+
+        Assertions.assertThat(getRequestBillThree.getResolvedException().getMessage())
+                .isEqualTo("Your account must contain default bill");
     }
 }

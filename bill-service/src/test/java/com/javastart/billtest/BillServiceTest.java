@@ -50,7 +50,7 @@ public class BillServiceTest {
 
         billService.createBill(1l, 3l, BigDecimal.valueOf(5000), false, true);
 
-        Mockito.when(billRepository.getBillsByAccountId(1l)).
+        Mockito.when(billRepository.getBillsByAccountIdOrderByBillId(1l)).
                 thenReturn(Arrays.asList(billReturn));
 
         Throwable throwable2 = assertThrows(BillCreateException.class, () -> {

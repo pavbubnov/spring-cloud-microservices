@@ -29,8 +29,8 @@ public class AccountService {
     /**
      * Get account information by account id
      *
-     * @param accountId - Id number of response account
-     * @return {@link Account} - full database information about response account
+     * @param accountId - Id number of requested account
+     * @return {@link Account} - full database information about requested account
      * @throws AccountNotFoundException - if unable to find account with necessary id
      */
     public Account getAccountById(Long accountId) {
@@ -97,7 +97,7 @@ public class AccountService {
     /**
      * Delete account of the person
      * <p>
-     * Exception from {@link AccountService#getAccountById} if unable to find request account
+     * Exception from {@link AccountService#getAccountById} if unable to find requested account
      *
      * @param accountId Id number of deleting account
      * @return {@link Account} - last database information before deleting
