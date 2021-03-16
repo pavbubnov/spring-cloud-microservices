@@ -7,12 +7,11 @@ spring:
     properties:
   datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/account_service_database
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/account_service_database}
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
-
-
+#    sslmode: require
 server:
   servlet:
     context-path: /accounts

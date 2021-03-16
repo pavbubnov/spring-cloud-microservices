@@ -3,7 +3,10 @@ spring:
     name: gateway
   cloud:
     config:
-      uri: http://localhost:8001
+      uri: ${CONFIG_SERVER_URL:http://localhost:8001}
       fail-fast: true
       password: admin
       username: user
+      enabled: true
+  profiles:
+    active: ${SPR_PROFILE:}

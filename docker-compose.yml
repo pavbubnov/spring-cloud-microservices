@@ -56,35 +56,37 @@ services:
       - registry
       - notification-service
 
-  payment-service:
-    restart: on-failure
-    container_name: payment-service
-    build: payment-service
-    ports:
-      - 9876:9876
-    depends_on:
-      - config-service
-      - registry
-      - notification-service
-      - deposit-service
-
-  transfer-service:
-    restart: on-failure
-    container_name: transfer-service
-    build: transfer-service
-    ports:
-      - 5431:5431
-    depends_on:
-      - config-service
-      - registry
-      - notification-service
-      - deposit-service
-      - payment-service
+#  payment-service:
+#    restart: on-failure
+#    container_name: payment-service
+#    build: payment-service
+#    ports:
+#      - 9876:9876
+#    depends_on:
+#      - config-service
+#      - registry
+#      - notification-service
+#      - deposit-service
+#
+#  transfer-service:
+#    restart: on-failure
+#    container_name: transfer-service
+#    build: transfer-service
+#    ports:
+#      - 5431:5431
+#    depends_on:
+#      - config-service
+#      - registry
+#      - notification-service
+#      - deposit-service
+#      - payment-service
 
   notification-service:
     restart: on-failure
     container_name: notification-service
     build: notification-service
+    ports:
+      - 9999:9999
     depends_on:
       - config-service
       - registry
