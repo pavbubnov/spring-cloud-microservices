@@ -104,7 +104,7 @@ public class AccountService {
      */
     public Account deleteAccount(Long accountId) {
         Account deletedAccount = getAccountById(accountId);
-        deletedAccount.toString();
+        deletedAccount.toString();//разберемся с LAZY и уберем
         accountRepository.deleteById(accountId);
         return deletedAccount;
     }

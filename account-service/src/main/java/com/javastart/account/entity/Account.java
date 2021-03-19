@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
@@ -16,6 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @ToString
+@Transactional
 public class Account {
 
     @Id

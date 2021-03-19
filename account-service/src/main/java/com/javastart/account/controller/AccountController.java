@@ -50,6 +50,7 @@ public class AccountController {
         return new AccountResponseDTO(accountService.addAccountBills(accountId, additionalBill));
     }
 
+
     @DeleteMapping("/{accountId}")
     public Account deleteAccount(@PathVariable @Positive(message = "Please, enter correct Id (Path)") Long accountId) {
         return accountService.deleteAccount(accountId);

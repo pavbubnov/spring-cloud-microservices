@@ -7,6 +7,12 @@
 
 Java Spring Cloud application for making transfers, deposits and payments as Bank System
 
+### Main capabilities: 
+* Create person account
+* Create a bill owned by account 
+* Make deposits and payments to/from bill (with email notification)
+* Transfer funds from one bill to another bill (with email notification to both accounts)
+
 ### Tags
 - Spring 
 - Spring Boot
@@ -16,6 +22,11 @@ Java Spring Cloud application for making transfers, deposits and payments as Ban
 - RabbitMq
 - REST
 - AMQP
+- Eureka
+- Zuul
+- Feign
+- Ribbon
+- Docker
 
 ## Architecture
  <p>
@@ -37,7 +48,8 @@ with information about succeed transactional is used RabbitMQ `message broker` w
 | **POST** | accounts/| create account | *name*, *email*, *phone*, *bills* (list of bills)
 | **GET** | accounts/{accountId}| get account information by id | 
 | **PUT** | accounts/{accountId}| update account |  *name*, *email*, *phone*, *bills* (list of bills)
-| **PATCH** | accounts/{accountId}| add new bills to account |  *bills* (additional list of bills)
+| **PATCH** | accounts/{account
+Id}| add new bills to account |  *bills* (additional list of bills)
 | **DELETE** | accounts/{accountId}| delete account | 
 | `bill-service (port 8082)`|
 | **POST** | bills/| create bill | *account_id*, *bill_id*, *amount*, *is_default*, *is_overdraft_enabled*
@@ -60,15 +72,81 @@ with information about succeed transactional is used RabbitMQ `message broker` w
 | **GET** | transfers/recipient/{recipientBillId}| get transfers information by recipient bill id |
 
 ### How to start
-###### Launch Application.java in  the following sequence:
+
+###### 1. Actions before start :
+
+a) Add email property file "mail-probs.properties" to "notification-service\src\main\resources" directory. 
+This file contains information about no-reply email from which notifications  are sent.
+Structure of this file:
+
+
+    mail.username=example@gmail.com 
+    mail.password=secretPassword
+    mail.transport.protocol=smtp
+    mail.smtp.auth=true
+    mail.smtp.starttls.enable=true
+    mail.debug=true`
+
+*Don't forget to add this file to ".gitignore" for your git repository.*
+
+*Additional security settings may be required in the mail profile.*
+
+b) PostgreSQL properties:
+*It is required to install PostqreSQL.*
+
+b)1)Find and open "postgresql.conf" file at your computer - windows location approximately
+ 
+C:\Program Files\PostgreSQL\8.4\data\postgresql.conf, where 8.4 - your PostgreSQL version 
+
+b)2)Find line "listen_addresses" at "postgresql.conf" (pproximately line 59 ) and change to 
+
+"listen_addresses = '*'		# what IP address(es) to listen on;"
+
+b)3)Find and open "pg_hba.conf" at the same location
+
+b)4) Add line "host    all             all              ::/0                   trust" at the end of "pg_hba.conf" file 
+
+b)5) At config-service\src\main\resources\services directory are located configuration .yml files.
+You can tune PostgreSQL access setting:
+
+-Your password and username (default: postgres/admin).
+
+-Name of pre-created databases. You can create database with the same name -> at this case you don't need to change 
+database name (default name: account_service_database; bill_service_database, deposit_service_database,
+payment_service_database, transfer_service_database).
+
+-Port of your database (default: 5432).
+
+###### 2.  It is allowed to start application from docker (if there is no need to start application from docker go to step 3) :
+*It is required to install Docker.*
+
+a) This application contains Dockerfile at each microservice package. One line in this files at account, bill, deposit,
+payment and transfer services depends on the name of database and wireless network adapter ip. This is DATASOURCE_URL
+variable. Default ip is 192.168.1.55, database names according b)5).
+You can find your wireless network adapter ip by command line:
+C:\Users>ipconfig -> database and wireless network adapter ip -> IPv4-adress
+
+b) Run Clean and build tasks with Gradle tool (e.g. with Intellij IDEA)
+
+c) Start Docker application.
+
+c) Run "docker-compose build" command at spring-cloud-microservices folder. Wait for successful build.
+
+d) Run "docker-compose up" command at spring-cloud-microservices folder. Wait for successful start.
+
+*It is required to set more then 6GB memory in docker properties*
+
+###### 3.  Sequential launch of application :
+*It is required to install Docker.*
+
+a) Start Docker application.
+
+b) Run command "docker run -p 15672:15672 -p 5672:5672 rabbitmq:3-management"
+
+c) Launch Application.java in  the following sequence:
 `ConfigApplication` -> `RegistryApplication` -> `GatewayApplication` ->
 `AccountApplication` -> `BillApplication` -> `NotificationApplication` ->
 `DepositApplication` -> `PaymentApplication` -> `TransferApplication`
-
-*PostgreSQL database and RabbitMQ requires personal settings*
-
-###### Also application contain Dockerfiles and docker-compose.yml (configuration files to quick start with only several commands).
-*It is possible to tune application quick start with Docker container if user have enough RAM*
 
 ### Necessary steps with JSON examples:
 ###### 1. Create account :
@@ -113,4 +191,4 @@ with information about succeed transactional is used RabbitMQ `message broker` w
     }
 
 
-
+*Other command according "Requests table"*
