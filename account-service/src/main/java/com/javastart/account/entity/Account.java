@@ -15,7 +15,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @ToString
-@Transactional
 public class Account {
 
     @Id

@@ -6,6 +6,7 @@ import com.javastart.account.controller.dto.AddBillsRequestDTO;
 import com.javastart.account.entity.Account;
 import com.javastart.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

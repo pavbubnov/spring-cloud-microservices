@@ -37,7 +37,7 @@ Java Spring Cloud application for making transfers, deposits and payments as Ban
 `Discovery service` (Eureka from Netflix) performs the functions of service discovery, registration of service addresses and their instances.
 REST request from Client to `Gateway API` (Zuul from Netflix) (port 8989) is automatically redirected to necessary microservice.
 Spring Cloud libraries contain Ribbon `Load Balancer`.
-Feign `HTTP Client` from Spring Cloud used for http requests between database microcervices. For sending email message 
+Feign `HTTP Client` from Spring Cloud used for http requests between microservices. For sending email message 
 with information about succeed transactional is used RabbitMQ `message broker` with the help of Notification service.*
 
 ### Requests table
@@ -73,6 +73,9 @@ Id}| add new bills to account |  *bills* (additional list of bills)
 
 ### How to start
 
+You can quickly start application with docker: Run Clean and build tasks with Gradle tool ->  Run "docker-compose build" -> Run "docker-compose up"
+
+*It is highly recommended to read full instruction below.*
 ###### 1. Actions before start :
 
 a) Add email property file "mail-probs.properties" to "notification-service\src\main\resources" directory. 

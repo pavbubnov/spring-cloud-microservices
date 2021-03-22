@@ -53,5 +53,5 @@ dependencies {
     testImplementation "junit:junit:4.13"
     testImplementation "org.junit.jupiter:junit-jupiter:5.6.0"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.6.0"
-
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.0-M1'
 }

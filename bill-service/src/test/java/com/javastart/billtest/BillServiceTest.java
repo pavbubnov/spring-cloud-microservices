@@ -36,8 +36,7 @@ public class BillServiceTest {
     private BillService billService;
 
     @Test
-    public void createBillTest() {
-
+    public void accountDoesNotContainBillTest() {
         returnAccountResponseDTO(1l);
 
         Throwable throwable = assertThrows(BillCreateException.class, () -> {
@@ -45,28 +44,43 @@ public class BillServiceTest {
                     true, true);
         });
         assertTrue(throwable.getMessage().equals("Account with id: 1 doesn't contain bill with id: 1"));
+    }
 
-        Bill billReturn = createBill(1l, 3l, BigDecimal.valueOf(5000), false, true);
-
-        billService.createBill(1l, 3l, BigDecimal.valueOf(5000), false, true);
-
-        Mockito.when(billRepository.getBillsByAccountIdOrderByBillId(1l)).
-                thenReturn(Arrays.asList(billReturn));
+    @Test
+    public void billAlreadyExistTest() {
+        returnAccountResponseDTO(1l);
+        setBillForAccount();
 
         Throwable throwable2 = assertThrows(BillCreateException.class, () -> {
             billService.createBill(1l, 3l, BigDecimal.valueOf(5000),
                     true, true);
         });
         assertTrue(throwable2.getMessage().equals("Bill with id: " + 3l + " is already exists"));
+    }
 
+    @Test
+    public void unableToFindBillTest() {
+        returnAccountResponseDTO(1l);
+        setBillForAccount();
         Throwable throwable3 = assertThrows(BillCreateException.class, () -> {
             billService.getBillById(4l);
         });
         assertTrue(throwable3.getMessage().equals("Unable to find bill with id: " + 4l));
+    }
 
+    @Test
+    public void getBillByAccountIdTest() {
+        returnAccountResponseDTO(1l);
+        setBillForAccount();
         Assertions.assertThat(billService.getBillsByAccountId(2l)).isEqualTo(Arrays.asList());
-
         Assertions.assertThat(billService.getBillsByAccountId(1l).get(0).getBillId()).isEqualTo(3);
+    }
+
+    @Test
+    public void updateBillException() {
+
+        returnAccountResponseDTO(1l);
+        setBillForAccount();
 
         Throwable throwable4 = assertThrows(BillCreateException.class, () -> {
             billService.updateBill(4l, 1l, BigDecimal.valueOf(5000), true, true);
@@ -87,6 +101,7 @@ public class BillServiceTest {
                         "Lori@cat.xyz", "Lori", "+123456"));
     }
 
+
     private Bill createBill(Long accountId, Long billId, BigDecimal amount, Boolean isDefault,
                             Boolean overdraftEnabled) {
 
@@ -102,6 +117,15 @@ public class BillServiceTest {
 
         return billReturn;
 
+    }
+
+    private void setBillForAccount() {
+        Bill billReturn = createBill(1l, 3l, BigDecimal.valueOf(5000), false, true);
+
+        billService.createBill(1l, 3l, BigDecimal.valueOf(5000), false, true);
+
+        Mockito.when(billRepository.getBillsByAccountIdOrderByBillId(1l)).
+                thenReturn(Arrays.asList(billReturn));
     }
 
 

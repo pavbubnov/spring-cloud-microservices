@@ -3,30 +3,29 @@ package com.javastart.accounttest.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javastart.account.AccountApplication;
 import com.javastart.account.controller.dto.AccountResponseDTO;
-import com.javastart.account.controller.dto.AddBillsRequestDTO;
 import com.javastart.accounttest.config.SpringH2DatabaseConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Arrays;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {AccountApplication.class, SpringH2DatabaseConfig.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class AccountControllerTest {
 
     private MockMvc mockMvc;
@@ -34,13 +33,11 @@ public class AccountControllerTest {
     @Autowired
     private WebApplicationContext context;
 
-    @MockBean
-    private RabbitTemplate rabbitTemplate;
-
-
     @Before
-    public void setup() {
+    public void setupBefore() {
+
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
     }
 
     private static final String REQUEST_EQUALS = "{\n" +
@@ -100,79 +97,93 @@ public class AccountControllerTest {
             "    \"bills\": [10, 11]\n" +
             "}";
 
+    @Test()
+    public void equalsBillsTest() throws Exception {
+
+        Assertions.assertThat(createAccountIsBadRequest(REQUEST_EQUALS).getResolvedException().getMessage())
+                .isEqualTo("You have equals bills, please, check");
+    }
 
     @Test
-    public void accountTest() throws Exception {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
-
-        MvcResult mvcResultEquals = mockMvc.perform(post("/")
-                .content(REQUEST_EQUALS).contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andReturn();
-
-        Assertions.assertThat(mvcResultEquals.getResolvedException().getMessage())
-                .isEqualTo("You have equals bills, please, check");
-
-        MvcResult mvcResultOne = mockMvc.perform(post("/")
-                .content(REQUEST_ONE).contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
-
-        MvcResult mvcResultRepeating = mockMvc.perform(post("/")
-                .content(REQUEST_REPEATING).contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andReturn();
-
-        Assertions.assertThat(mvcResultRepeating.getResolvedException().getMessage())
+    public void repeatingBillsTest() throws Exception {
+        createAccountIsOk(REQUEST_ONE);
+        Assertions.assertThat(createAccountIsBadRequest(REQUEST_REPEATING).getResolvedException().getMessage())
                 .isEqualTo("There is(are) bills with id :[3, 5]");
+    }
 
-        MvcResult mvcResultTwo = mockMvc.perform(post("/")
-                .content(REQUEST_TWO).contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
-
+    @Test
+    public void unableToFindBillTest() throws Exception {
+        createAccountIsOk(REQUEST_ONE);
+        createAccountIsOk(REQUEST_TWO);
 
         MvcResult getRequestNotExist = mockMvc.perform(get("/5")).andExpect(status()
                 .isNotFound()).andReturn();
 
         Assertions.assertThat(getRequestNotExist.getResolvedException().getMessage())
                 .isEqualTo("Unable to find account with id: " + 5);
+    }
 
+    @Test
+    public void getTestAccountOneOk() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
 
-        MvcResult getRequestAccountOne = mockMvc.perform(get("/1")).andExpect(status()
-                .isOk()).andReturn();
+        createAccountIsOk(REQUEST_ONE);
 
-        String body = getRequestAccountOne.getResponse().getContentAsString();
+        String body = getRequestOK("/1").getResponse().getContentAsString();
         AccountResponseDTO accountResponseDTOOne = objectMapper.readValue(body, AccountResponseDTO.class);
 
         Assertions.assertThat(accountResponseDTOOne.getName()).isEqualTo("Lori");
-        Assertions.assertThat(accountResponseDTOOne.getBills()).containsExactly(1l,3l,5l);
+        Assertions.assertThat(accountResponseDTOOne.getBills()).containsExactly(1l, 3l, 5l);
+    }
 
-        mvcResultRepeating = mockMvc.perform(put("/2")
+    @Test
+    public void updateExceptionTest() throws Exception {
+        createAccountIsOk(REQUEST_ONE);
+        createAccountIsOk(REQUEST_TWO);
+
+        MvcResult mvcResultRepeating = mockMvc.perform(put("/2")
                 .content(UPDATE_REQUEST_REPEATING).contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andReturn();
 
         Assertions.assertThat(mvcResultRepeating.getResolvedException().getMessage())
                 .isEqualTo("There is(are) bills with id :[3]");
 
-        mvcResultEquals = mockMvc.perform(put("/2")
+        MvcResult mvcResultEquals = mockMvc.perform(put("/2")
                 .content(UPDATE_REQUEST_EQUALS).contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andReturn();
 
         Assertions.assertThat(mvcResultEquals.getResolvedException().getMessage())
                 .isEqualTo("You have equals bills, please, check");
 
+    }
+
+
+    @Test
+    public void updateOkTest() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+
+        createAccountIsOk(REQUEST_ONE);
+        createAccountIsOk(REQUEST_TWO);
+
         MvcResult mvcResultUpdate = mockMvc.perform(put("/2")
                 .content(UPDATE_REQUEST).contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
 
-        MvcResult getRequestAccountTwo = mockMvc.perform(get("/2")).andExpect(status()
-                .isOk()).andReturn();
 
-        body = getRequestAccountTwo.getResponse().getContentAsString();
+        String body = getRequestOK("/2").getResponse().getContentAsString();
         AccountResponseDTO accountResponseDTOTwo = objectMapper.readValue(body, AccountResponseDTO.class);
 
         Assertions.assertThat(accountResponseDTOTwo.getEmail()).isEqualTo("BaxterOfficial@dog.xyz");
-        Assertions.assertThat(accountResponseDTOTwo.getBills()).containsExactly(2l,4l,6l,8l);
+        Assertions.assertThat(accountResponseDTOTwo.getBills()).containsExactly(2l, 4l, 6l, 8l);
 
+    }
+
+    @Test
+    public void addBillsExceptionTest() throws Exception {
+        createAccountIsOk(REQUEST_ONE);
+        createAccountIsOk(REQUEST_TWO);
 
         MvcResult mvcResultAdd = mockMvc.perform(patch("/2")
                 .content(ADD_REQUEST_REPEATING).contentType(MediaType.APPLICATION_JSON)
@@ -180,18 +191,31 @@ public class AccountControllerTest {
 
         Assertions.assertThat(mvcResultAdd.getResolvedException().getMessage())
                 .isEqualTo("There is(are) bills with id :[3]");
+    }
 
-        mvcResultAdd = mockMvc.perform(patch("/2")
+    @Test
+    public void addBillsOkTest() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+
+        createAccountIsOk(REQUEST_ONE);
+        createAccountIsOk(REQUEST_TWO);
+
+        MvcResult mvcResultAdd = mockMvc.perform(patch("/2")
                 .content(ADD_REQUEST).contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
 
-        getRequestAccountTwo = mockMvc.perform(get("/2")).andExpect(status()
-                .isOk()).andReturn();
+        String body = getRequestOK("/2").getResponse().getContentAsString();
+        AccountResponseDTO accountResponseDTOTwo = objectMapper.readValue(body, AccountResponseDTO.class);
 
-        body = getRequestAccountTwo.getResponse().getContentAsString();
-        accountResponseDTOTwo = objectMapper.readValue(body, AccountResponseDTO.class);
+        Assertions.assertThat(accountResponseDTOTwo.getBills()).containsExactly(2l, 4l, 6l, 10l, 11l);
 
-        Assertions.assertThat(accountResponseDTOTwo.getBills()).containsExactly(2l,4l,6l,8l,10l,11l);
+    }
+
+    @Test
+    public void deleteExceptionTest() throws Exception {
+        createAccountIsOk(REQUEST_ONE);
+        createAccountIsOk(REQUEST_TWO);
 
         MvcResult mvcResultDelete = mockMvc.perform(delete("/3"))
                 .andExpect(status().isNotFound()).andReturn();
@@ -199,14 +223,39 @@ public class AccountControllerTest {
         Assertions.assertThat(mvcResultDelete.getResolvedException().getMessage())
                 .isEqualTo("Unable to find account with id: " + 3);
 
-        mvcResultDelete = mockMvc.perform(delete("/2"))
+    }
+
+    @Test
+    public void deleteOkTest() throws Exception {
+        createAccountIsOk(REQUEST_ONE);
+        createAccountIsOk(REQUEST_TWO);
+
+        MvcResult mvcResultDelete = mockMvc.perform(delete("/2"))
                 .andExpect(status().isOk()).andReturn();
 
-        getRequestAccountTwo = mockMvc.perform(get("/2")).andExpect(status()
+        MvcResult getRequestAccountTwo = mockMvc.perform(get("/2")).andExpect(status()
                 .isNotFound()).andReturn();
 
         Assertions.assertThat(getRequestAccountTwo.getResolvedException().getMessage())
                 .isEqualTo("Unable to find account with id: " + 2);
-
     }
+
+    private MvcResult createAccountIsOk(String request) throws Exception {
+        return mockMvc.perform(post("/")
+                .content(request).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
+    }
+
+    private MvcResult createAccountIsBadRequest(String request) throws Exception {
+        return mockMvc.perform(post("/")
+                .content(request).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andReturn();
+    }
+
+    private MvcResult getRequestOK(String id) throws Exception {
+        return mockMvc.perform(get(id)).andExpect(status()
+                .isOk()).andReturn();
+    }
+
+
 }
