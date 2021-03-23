@@ -15,6 +15,9 @@ zuul:
   host:
     connect-timeout-millis: 20000
     socket-timeout-millis: 20000
+  ribbon:
+    eager-load:
+      enabled: true
 
   routes:
     account-service:
@@ -30,6 +33,16 @@ zuul:
     deposit-service:
       path: /deposits/**
       serviceId: deposit-service
+      stripPrefix: false
+
+    payment-service:
+      path: /payments/**
+      serviceId: payment-service
+      stripPrefix: false
+
+    transfer-service:
+      path: /transfers/**
+      serviceId: transfer-service
       stripPrefix: false
 
 server:

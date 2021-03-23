@@ -15,4 +15,6 @@ eureka:
     preferIpAddress: true
   client:
     service-url:
-      defaultZone: http://registry:8761/eureka/
+       defaultZone: ${CONFIG_SERVICE_URL:http://localhost:8761/eureka/}
+
+

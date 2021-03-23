@@ -3,11 +3,13 @@ spring:
     name: registry
   cloud:
     config:
-      uri: http://config-service:8001
+      uri: ${CONFIG_SERVER_URL:http://localhost:8001}
       fail-fast: true
       password: admin
       username: user
-
+      enabled: true
+  profiles:
+    active: ${SPR_PROFILE:}
 eureka:
   instance:
     preferIpAddress: true
